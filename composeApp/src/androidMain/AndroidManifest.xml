@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- so that the phone can look for bluetooth devices -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <!-- lets the app discover bluetooth devices locally (app-initiated) and manipulate bluetooth settings -->
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+    <!-- so that the phone can be made discoverable to other bluetooth devices -->
+    <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
+
+    <!-- so that the app can communicate with paired devices -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+    <!-- so that the app can get the location of the peripheral -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- specifies that BLE is a critical part of the app and hides this app from users who do not have it-->
+    <!-- note: this can be changed to 'false' and then checked at runtime if we want -->
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"

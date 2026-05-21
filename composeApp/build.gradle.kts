@@ -11,13 +11,14 @@ plugins {
     alias(libs.plugins.androidx.room) // **ADDED** for Room
 }
 
+
 kotlin {
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -33,6 +34,7 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.room.sqlite.wrapper) // **ADDED** for Room
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0") //added for Kable
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -52,6 +54,9 @@ kotlin {
             implementation(libs.androidx.sqlite.bundled) // **ADDED** for Room
 
             implementation(libs.kotlinx.datetime) // **ADDED** for date/time handling
+
+            api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0") //added for Kable
+            implementation("com.juul.kable:kable-core:0.35.0") //added for Kable
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

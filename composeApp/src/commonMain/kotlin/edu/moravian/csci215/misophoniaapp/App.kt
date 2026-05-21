@@ -3,13 +3,18 @@ package edu.moravian.csci215.misophoniaapp
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -17,7 +22,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -56,19 +63,44 @@ fun App() {
             bottomBar = {
                 BottomAppBar(
                     actions = {
-                        IconButton({ navController.navigate(Hub) }) {
-                            painterResource(Res.drawable.home_button)
+                        Row(
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            IconButton({ navController.navigate(Hub) }) {
+                                Icon(
+                                    painterResource(Res.drawable.home_button),
+                                    "The home button",
+                                    Modifier.size(35.dp),
+                                    Color.White
+                                )
+                            }
+                            IconButton({ navController.navigate(HeadphonesSettings) }) {
+                                Icon(
+                                    painterResource(Res.drawable.headphones),
+                                    "The headphones settings button",
+                                    Modifier.size(35.dp),
+                                    Color.White
+                                )
+                            }
+                            IconButton({ navController.navigate(ViewSurvey) }) {
+                                Icon(
+                                    painterResource(Res.drawable.view_history),
+                                    "The trigger survey history button",
+                                    Modifier.size(35.dp),
+                                    Color.White
+                                )
+                            }
+                            IconButton({ navController.navigate(AppSettings) }) {
+                                Icon(
+                                    painterResource(Res.drawable.settings),
+                                    "The app settings button",
+                                    Modifier.size(35.dp),
+                                    Color.White
+                                )
+                            }
                         }
-                        IconButton({ navController.navigate(HeadphonesSettings) }) {
-                            painterResource(Res.drawable.headphones)
-                        }
-                        IconButton({ navController.navigate(ViewSurvey) }) {
-                            painterResource(Res.drawable.view_history)
-                        }
-                        IconButton({ navController.navigate(AppSettings) }) {
-                            painterResource(Res.drawable.settings)
-                        }
-                    }
+                    },
+                    containerColor = Color.Red
                 )
             }
         ){
