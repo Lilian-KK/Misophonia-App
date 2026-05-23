@@ -7,14 +7,14 @@ import androidx.compose.runtime.Composable
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object TriggerHistory
+data object SurveyHistory
 
 @Composable
-fun TriggerHistoryScreen(
+fun SurveyHistoryScreen(
     onViewPastSurvey: () -> Unit
 ) {
     Column() {
-        Text("This is TriggerHistoryScreen.")
+        Text("This is SurveyHistoryScreen.")
         Button(onClick = onViewPastSurvey ) {
             Text("to a past survey!")
         }

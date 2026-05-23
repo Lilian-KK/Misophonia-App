@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import edu.moravian.csci215.misophoniaapp.screens.AppSettings
 import edu.moravian.csci215.misophoniaapp.screens.AppSettingsScreen
 import edu.moravian.csci215.misophoniaapp.screens.HeadphonesSettings
@@ -36,12 +37,13 @@ import edu.moravian.csci215.misophoniaapp.screens.Hub
 import edu.moravian.csci215.misophoniaapp.screens.HubScreen
 import edu.moravian.csci215.misophoniaapp.screens.Setup
 import edu.moravian.csci215.misophoniaapp.screens.SetupScreen
-import edu.moravian.csci215.misophoniaapp.screens.Survey
+import edu.moravian.csci215.misophoniaapp.screens.SurveyHistory
+import edu.moravian.csci215.misophoniaapp.screens.SurveyHistoryScreen
 import edu.moravian.csci215.misophoniaapp.screens.SurveyScreen
-import edu.moravian.csci215.misophoniaapp.screens.TriggerHistory
-import edu.moravian.csci215.misophoniaapp.screens.TriggerHistoryScreen
 import edu.moravian.csci215.misophoniaapp.screens.ViewSurvey
 import edu.moravian.csci215.misophoniaapp.screens.ViewSurveyScreen
+import edu.moravian.csci215.misophoniaapp.screens.WifiNetworks
+import edu.moravian.csci215.misophoniaapp.survey_data.SurveyRepository
 import org.jetbrains.compose.resources.painterResource
 
 import misophoniaapp.composeapp.generated.resources.Res
@@ -50,11 +52,12 @@ import misophoniaapp.composeapp.generated.resources.headphones
 import misophoniaapp.composeapp.generated.resources.home_button
 import misophoniaapp.composeapp.generated.resources.settings
 import misophoniaapp.composeapp.generated.resources.view_history
+import misophoniaapp.composeapp.generated.resources.wifi
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 @Preview
-fun App() {
+fun App(repository : SurveyRepository) {
     val navController = rememberNavController()
     val isSetup = false
 
@@ -98,6 +101,14 @@ fun App() {
                                     Color.White
                                 )
                             }
+                            IconButton({ navController.navigate(WifiNetworks) }) {
+                                Icon(
+                                    painterResource(Res.drawable.wifi),
+                                    "The wifi settings button",
+                                    Modifier.size(35.dp),
+                                    Color.White
+                                )
+                            }
                         }
                     },
                     containerColor = Color.Red
@@ -116,24 +127,27 @@ fun App() {
                 composable<Hub> {
                     HubScreen() {
                         //this one will need specific params for which survey, just basic now
-                        navController.navigate(Survey)
+                        navController.navigate(SurveyScreen)
                     }
                 }
                 composable<HeadphonesSettings> {
-                    HeadphonesSettingsScreen()
-                }
-                composable<Survey> {
-                    SurveyScreen() {
-                        navController.navigate(TriggerHistory)
+                    HeadphonesSettingsScreen() {
+                        navController.navigate(WifiNetworks)
                     }
                 }
-                composable<TriggerHistory> {
-                    TriggerHistoryScreen() {
+                composable<SurveyScreen> {
+                    SurveyScreen(repository) {
+                        navController.navigate(SurveyHistory)
+                    }
+                }
+                composable<SurveyHistory> {
+                    SurveyHistoryScreen() {
                         navController.navigate(ViewSurvey)
                     }
                 }
-                composable<ViewSurvey> {
-                    ViewSurveyScreen()
+                composable<ViewSurvey> {navBackStackEntry ->
+                    val surveyId = navBackStackEntry.toRoute<ViewSurvey>().surveyId
+                    ViewSurveyScreen(surveyId, repository)
                 }
                 composable<AppSettings> {
                     AppSettingsScreen()

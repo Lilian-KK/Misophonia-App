@@ -1,0 +1,59 @@
+package edu.moravian.csci215.misophoniaapp.survey_data
+
+import edu.moravian.csci215.misophoniaapp.currentTimeMillis
+import kotlinx.coroutines.flow.Flow
+
+class SurveyRepository(
+    private val dao: SurveyResultDao,
+) {
+    val latestResult: Flow<SurveyResultEntity?> = dao.observeLatest()
+    val allResults: Flow<List<SurveyResultEntity>> = dao.observeAll()
+
+    fun getResult(id: Long): Flow<SurveyResultEntity?> = dao.observeById(id)
+
+    fun singleQuestionResults(surveyResultId: Long) =
+        dao.answersForSingleQuestions(surveyResultId)
+
+    fun multiQuestionResults(surveyResultId: Long) =
+        dao.answersForMultiQuestions(surveyResultId)
+
+    fun singleQuestionResult(surveyResultId: Long, questionId: String) =
+        dao.answerForSingleQuestion(surveyResultId, questionId)
+
+    fun multiQuestionResult(surveyResultId: Long, questionId: String) =
+        dao.answerForMultiQuestion(surveyResultId, questionId)
+
+    suspend fun saveResult(score: Int): Long =
+        dao.insert(
+            SurveyResultEntity(
+                completedAtEpochMillis = currentTimeMillis(),
+                totalScore = score,
+            ),
+        )
+
+    suspend fun saveSingleQuestion(
+        surveyId: Long,
+        questionId: String,
+        answer: Int,
+    ): Long = dao.insert(
+        SurveyQuestionSingleAnswerResultEntity(
+            surveyResultId = surveyId,
+            questionId = questionId,
+            answer = answer,
+        ),
+    )
+
+    suspend fun saveMultiQuestion(
+        surveyId: Long,
+        questionId: String,
+        answers: Set<Int>,
+        other: String? = null,
+    ): Long = dao.insert(
+        SurveyQuestionMultiAnswerResultEntity(
+            surveyResultId = surveyId,
+            questionId = questionId,
+            answers = answers,
+            other = other,
+        ),
+    )
+}
