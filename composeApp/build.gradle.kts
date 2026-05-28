@@ -35,6 +35,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.room.sqlite.wrapper) // **ADDED** for Room
             implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0") //added for Kable
+            implementation("androidx.activity:activity-compose:1.9.0") //for android activity
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)

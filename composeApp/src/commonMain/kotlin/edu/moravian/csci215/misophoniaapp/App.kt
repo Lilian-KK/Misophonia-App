@@ -29,6 +29,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.juul.kable.Bluetooth
+import com.juul.kable.Filter
+import com.juul.kable.Peripheral
+import com.juul.kable.Scanner
+import com.juul.kable.characteristicOf
+import com.juul.kable.peripheral
 import edu.moravian.csci215.misophoniaapp.screens.AppSettings
 import edu.moravian.csci215.misophoniaapp.screens.AppSettingsScreen
 import edu.moravian.csci215.misophoniaapp.screens.HeadphonesSettings
@@ -44,6 +50,8 @@ import edu.moravian.csci215.misophoniaapp.screens.ViewSurvey
 import edu.moravian.csci215.misophoniaapp.screens.ViewSurveyScreen
 import edu.moravian.csci215.misophoniaapp.screens.WifiNetworks
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyRepository
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
 import misophoniaapp.composeapp.generated.resources.Res
@@ -53,13 +61,23 @@ import misophoniaapp.composeapp.generated.resources.home_button
 import misophoniaapp.composeapp.generated.resources.settings
 import misophoniaapp.composeapp.generated.resources.view_history
 import misophoniaapp.composeapp.generated.resources.wifi
+import kotlin.time.Clock
+import androidx.compose.runtime.*
+import androidx.compose.material3.*
+import edu.moravian.csci215.misophoniaapp.screens.SurveyCompanion
+import edu.moravian.csci215.misophoniaapp.screens.WifiNetworksScreen
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 @Preview
 fun App(repository : SurveyRepository) {
     val navController = rememberNavController()
+    val coroutineScope = rememberCoroutineScope()
     val isSetup = false
+
+    LaunchedEffect(Unit) {
+        scanKable()
+    }
 
     MaterialTheme {
         Scaffold(
@@ -85,7 +103,7 @@ fun App(repository : SurveyRepository) {
                                     Color.White
                                 )
                             }
-                            IconButton({ navController.navigate(ViewSurvey) }) {
+                            IconButton({ navController.navigate(SurveyHistory) }) {
                                 Icon(
                                     painterResource(Res.drawable.view_history),
                                     "The trigger survey history button",
@@ -127,7 +145,7 @@ fun App(repository : SurveyRepository) {
                 composable<Hub> {
                     HubScreen() {
                         //this one will need specific params for which survey, just basic now
-                        navController.navigate(SurveyScreen)
+                        navController.navigate(SurveyCompanion)
                     }
                 }
                 composable<HeadphonesSettings> {
@@ -135,24 +153,50 @@ fun App(repository : SurveyRepository) {
                         navController.navigate(WifiNetworks)
                     }
                 }
-                composable<SurveyScreen> {
+                composable<SurveyCompanion> {
                     SurveyScreen(repository) {
                         navController.navigate(SurveyHistory)
                     }
                 }
                 composable<SurveyHistory> {
-                    SurveyHistoryScreen() {
-                        navController.navigate(ViewSurvey)
+                    SurveyHistoryScreen(repository) {
+                        navController.navigate(ViewSurvey(1L))
                     }
                 }
-                composable<ViewSurvey> {navBackStackEntry ->
+                composable<ViewSurvey> { navBackStackEntry ->
                     val surveyId = navBackStackEntry.toRoute<ViewSurvey>().surveyId
                     ViewSurveyScreen(surveyId, repository)
                 }
                 composable<AppSettings> {
                     AppSettingsScreen()
                 }
+                composable<WifiNetworks> {
+                    WifiNetworksScreen()
+                }
             }
         }
     }
+}
+
+suspend fun scanKable() {
+    println("proof that testingkable is running")
+    val advertisement = Scanner {
+        filters {
+            match {
+                println("before services created")
+                services = listOf(Bluetooth.BaseUuid + 0x180F) //battery service
+                println("after services created")
+            }
+        }
+    }.advertisements.first()
+//    val advertisement = Scanner().advertisements.first()
+
+    println("before peripheral created")
+    val peripheral = Peripheral(advertisement) { }
+    peripheral.connect()
+    println("peripheral connected")
+
+    println("before batterydata connected")
+    val batteryData = peripheral.read(characteristicOf("0x180F", "0x2A19"))
+    println("Hey this is the battery data allegedly:" + batteryData)
 }

@@ -37,7 +37,7 @@ import misophoniaapp.composeapp.generated.resources.submit
 import org.jetbrains.compose.resources.stringResource
 
 @Serializable
-data object SurveyScreen
+data object SurveyCompanion
 
 /**
  * Displays the survey screen, which consists of a column with the survey view and a submit button.
