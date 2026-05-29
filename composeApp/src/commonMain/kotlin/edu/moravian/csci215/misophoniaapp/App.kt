@@ -138,9 +138,10 @@ fun App(repository : SurveyRepository) {
                 startDestination = if (isSetup) Hub else Setup
             ) {
                 composable<Setup> {
-                    SetupScreen() {
-                        navController.navigate(Hub)
-                    }
+                    SetupScreen(
+                        onLogin = { navController.navigate(Hub) },
+                        onCreateAccount = { navController.navigate(Hub) }
+                    )
                 }
                 composable<Hub> {
                     HubScreen() {
