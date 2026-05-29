@@ -184,6 +184,9 @@ suspend fun scanKable() {
         filters {
             match {
                 println("before services created")
+                //filter out unnamed devices, show the user a list of all available peripherals to select
+                //nimBLE
+                //let them connect to one, once they connect to it display information (characteristics?) about it
                 services = listOf(Bluetooth.BaseUuid + 0x180F) //battery service
                 println("after services created")
             }
@@ -197,6 +200,6 @@ suspend fun scanKable() {
     println("peripheral connected")
 
     println("before batterydata connected")
-    val batteryData = peripheral.read(characteristicOf("0x180F", "0x2A19"))
+    val batteryData = peripheral.read(characteristicOf("0x180F", "0x2A19")) //the battery level characteristic
     println("Hey this is the battery data allegedly:" + batteryData)
 }

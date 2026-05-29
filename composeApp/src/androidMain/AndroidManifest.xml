@@ -2,8 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+
     <!-- so that the phone can look for bluetooth devices -->
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+
     <!-- lets the app discover bluetooth devices locally (app-initiated) and manipulate bluetooth settings -->
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
@@ -16,12 +19,13 @@
     <!-- so that the app can get the location of the peripheral -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
+    <!-- for android 11 or under -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <!-- specifies that BLE is a critical part of the app and hides this app from users who do not have it-->
     <!-- note: this can be changed to 'false' and then checked at runtime if we want -->
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/>
 
-    <!-- for android 11 and lower -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
