@@ -64,6 +64,7 @@ import misophoniaapp.composeapp.generated.resources.wifi
 import kotlin.time.Clock
 import androidx.compose.runtime.*
 import androidx.compose.material3.*
+import androidx.navigation.compose.currentBackStackEntryAsState
 import edu.moravian.csci215.misophoniaapp.screens.SurveyCompanion
 import edu.moravian.csci215.misophoniaapp.screens.WifiNetworksScreen
 
@@ -74,71 +75,74 @@ fun App(repository : SurveyRepository) {
     val navController = rememberNavController()
     val coroutineScope = rememberCoroutineScope()
     val isSetup = false
-
-    LaunchedEffect(Unit) {
-        scanKable()
-    }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentScreen = navBackStackEntry?.destination?.route
+    // todo make this less redundant/more efficient
+    val screensWithBottomBar = listOf("edu.moravian.csci215.misophoniaapp.screens." + AppSettings.toString(), "edu.moravian.csci215.misophoniaapp.screens." + HeadphonesSettings.toString(), "edu.moravian.csci215.misophoniaapp.screens." + Hub.toString(), "edu.moravian.csci215.misophoniaapp.screens." + SurveyHistory.toString(), "edu.moravian.csci215.misophoniaapp.screens." + WifiNetworks.toString())
 
     MaterialTheme {
         Scaffold(
             bottomBar = {
-                BottomAppBar(
-                    actions = {
-                        Row(
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            IconButton({ navController.navigate(Hub) }) {
-                                Icon(
-                                    painterResource(Res.drawable.home_button),
-                                    "The home button",
-                                    Modifier.size(35.dp),
-                                    Color.White
-                                )
+                if (screensWithBottomBar.contains(currentScreen)) {
+                    BottomAppBar(
+                        actions = {
+                            Row(
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                IconButton({ navController.navigate(Hub) }) {
+                                    Icon(
+                                        painterResource(Res.drawable.home_button),
+                                        "The home button",
+                                        Modifier.size(35.dp),
+                                        Color.White
+                                    )
+                                }
+                                IconButton({ navController.navigate(HeadphonesSettings) }) {
+                                    Icon(
+                                        painterResource(Res.drawable.headphones),
+                                        "The headphones settings button",
+                                        Modifier.size(35.dp),
+                                        Color.White
+                                    )
+                                }
+                                IconButton({ navController.navigate(SurveyHistory) }) {
+                                    Icon(
+                                        painterResource(Res.drawable.view_history),
+                                        "The trigger survey history button",
+                                        Modifier.size(35.dp),
+                                        Color.White
+                                    )
+                                }
+                                IconButton({ navController.navigate(AppSettings) }) {
+                                    Icon(
+                                        painterResource(Res.drawable.settings),
+                                        "The app settings button",
+                                        Modifier.size(35.dp),
+                                        Color.White
+                                    )
+                                }
+                                IconButton({ navController.navigate(WifiNetworks) }) {
+                                    Icon(
+                                        painterResource(Res.drawable.wifi),
+                                        "The wifi settings button",
+                                        Modifier.size(35.dp),
+                                        Color.White
+                                    )
+                                }
                             }
-                            IconButton({ navController.navigate(HeadphonesSettings) }) {
-                                Icon(
-                                    painterResource(Res.drawable.headphones),
-                                    "The headphones settings button",
-                                    Modifier.size(35.dp),
-                                    Color.White
-                                )
-                            }
-                            IconButton({ navController.navigate(SurveyHistory) }) {
-                                Icon(
-                                    painterResource(Res.drawable.view_history),
-                                    "The trigger survey history button",
-                                    Modifier.size(35.dp),
-                                    Color.White
-                                )
-                            }
-                            IconButton({ navController.navigate(AppSettings) }) {
-                                Icon(
-                                    painterResource(Res.drawable.settings),
-                                    "The app settings button",
-                                    Modifier.size(35.dp),
-                                    Color.White
-                                )
-                            }
-                            IconButton({ navController.navigate(WifiNetworks) }) {
-                                Icon(
-                                    painterResource(Res.drawable.wifi),
-                                    "The wifi settings button",
-                                    Modifier.size(35.dp),
-                                    Color.White
-                                )
-                            }
-                        }
-                    },
-                    containerColor = Color.Red
-                )
+                        },
+                        containerColor = Color.Red
+                    )
+                }
             }
-        ){
+        ) {
             NavHost(
                 navController,
                 startDestination = if (isSetup) Hub else Setup
             ) {
                 composable<Setup> {
                     SetupScreen(
+                        //make sure to upgrade the navigation once Figma screens implemented
                         onLogin = { navController.navigate(Hub) },
                         onCreateAccount = { navController.navigate(Hub) }
                     )
@@ -177,30 +181,4 @@ fun App(repository : SurveyRepository) {
             }
         }
     }
-}
-
-suspend fun scanKable() {
-    println("proof that testingkable is running")
-    val advertisement = Scanner {
-        filters {
-            match {
-                println("before services created")
-                //filter out unnamed devices, show the user a list of all available peripherals to select
-                //nimBLE
-                //let them connect to one, once they connect to it display information (characteristics?) about it
-                services = listOf(Bluetooth.BaseUuid + 0x180F) //battery service
-                println("after services created")
-            }
-        }
-    }.advertisements.first()
-//    val advertisement = Scanner().advertisements.first()
-
-    println("before peripheral created")
-    val peripheral = Peripheral(advertisement) { }
-    peripheral.connect()
-    println("peripheral connected")
-
-    println("before batterydata connected")
-    val batteryData = peripheral.read(characteristicOf("0x180F", "0x2A19")) //the battery level characteristic
-    println("Hey this is the battery data allegedly:" + batteryData)
 }

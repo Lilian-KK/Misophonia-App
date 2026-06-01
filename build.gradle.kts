@@ -8,5 +8,4 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.ksp) apply false // **ADDED** for Room
     alias(libs.plugins.androidx.room) apply false // **ADDED** for Room
-
 }

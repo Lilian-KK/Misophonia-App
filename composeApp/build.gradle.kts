@@ -11,7 +11,6 @@ plugins {
     alias(libs.plugins.androidx.room) // **ADDED** for Room
 }
 
-
 kotlin {
     androidTarget {
         compilerOptions {
@@ -58,6 +57,8 @@ kotlin {
 
             api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0") //added for Kable
             implementation("com.juul.kable:kable-core:0.35.0") //added for Kable
+
+            implementation("com.github.jens-muenker:fuzzywuzzy-kotlin:1.0.1") //added for fuzzywuzzy string comparison
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

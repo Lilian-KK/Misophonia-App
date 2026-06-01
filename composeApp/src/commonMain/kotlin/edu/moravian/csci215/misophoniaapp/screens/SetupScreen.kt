@@ -15,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,10 +31,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.juul.kable.Bluetooth
+import com.juul.kable.Peripheral
+import com.juul.kable.Scanner
+import com.juul.kable.characteristicOf
+import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
 
 @Serializable
 data object Setup
+
 
 private const val HEADPHONES_PATH =
     "M31.25 187.5V125C31.25 100.136 41.1272 76.2903 58.7087 58.7088C76.2903 41.1272 " +
@@ -55,6 +62,10 @@ fun SetupScreen(
 ) {
     val headphonesPath = remember {
         PathParser().parsePathString(HEADPHONES_PATH).toPath()
+    }
+
+    LaunchedEffect(Unit) {
+        scanKable()
     }
 
     Column(
@@ -137,4 +148,30 @@ fun SetupScreen(
             )
         }
     }
+}
+
+suspend fun scanKable() {
+    println("proof that testingkable is running")
+    val advertisement = Scanner {
+        filters {
+            match {
+                println("before services created")
+                //filter out unnamed devices, show the user a list of all available peripherals to select
+                //nimBLE
+                //let them connect to one, once they connect to it display information (characteristics?) about it
+                services = listOf(Bluetooth.BaseUuid + 0x180F) //battery service
+                println("after services created")
+            }
+        }
+    }.advertisements.first()
+//    val advertisement = Scanner().advertisements.first()
+
+    println("before peripheral created")
+    val peripheral = Peripheral(advertisement) { }
+    peripheral.connect()
+    println("peripheral connected")
+
+    println("before batterydata connected")
+    val batteryData = peripheral.read(characteristicOf("0x180F", "0x2A19")) //the battery level characteristic
+    println("Hey this is the battery data allegedly:" + batteryData)
 }
