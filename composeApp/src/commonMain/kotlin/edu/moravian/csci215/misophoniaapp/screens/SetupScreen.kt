@@ -32,16 +32,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.juul.kable.Bluetooth
+import com.juul.kable.Filter
 import com.juul.kable.Peripheral
 import com.juul.kable.Scanner
 import com.juul.kable.characteristicOf
+import com.juul.kable.logs.Logging
+import com.juul.kable.logs.SystemLogEngine
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
+import misophoniaapp.composeapp.generated.resources.Res
+import misophoniaapp.composeapp.generated.resources.create_account
+import misophoniaapp.composeapp.generated.resources.login
+import misophoniaapp.composeapp.generated.resources.welcome_message
+import org.jetbrains.compose.resources.stringResource
 
 @Serializable
 data object Setup
 
-
+//this is the strokes used to draw the headphones logo?
 private const val HEADPHONES_PATH =
     "M31.25 187.5V125C31.25 100.136 41.1272 76.2903 58.7087 58.7088C76.2903 41.1272 " +
             "100.136 31.25 125 31.25C149.864 31.25 173.71 41.1272 191.291 58.7088C208.873 76.2903 " +
@@ -64,6 +72,7 @@ fun SetupScreen(
         PathParser().parsePathString(HEADPHONES_PATH).toPath()
     }
 
+    //add check that ble permissions have been granted
     LaunchedEffect(Unit) {
         scanKable()
     }
@@ -77,7 +86,7 @@ fun SetupScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Welcome to Tranquilify",
+            text = stringResource(Res.string.welcome_message),
             fontSize = 36.sp,
             fontWeight = FontWeight.Normal,
             lineHeight = 44.sp,
@@ -118,7 +127,7 @@ fun SetupScreen(
             )
         ) {
             Text(
-                text = "Log In",
+                text = stringResource(Res.string.login),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 lineHeight = 24.sp,
@@ -140,7 +149,7 @@ fun SetupScreen(
             )
         ) {
             Text(
-                text = "Create an Account",
+                text = stringResource(Res.string.create_account),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 lineHeight = 24.sp,
@@ -160,11 +169,18 @@ suspend fun scanKable() {
                 //nimBLE
                 //let them connect to one, once they connect to it display information (characteristics?) about it
                 services = listOf(Bluetooth.BaseUuid + 0x180F) //battery service
-                println("after services created")
+                println("these are the services" + services)
             }
+        }
+        logging {
+            engine = SystemLogEngine
+            level = Logging.Level.Warnings
+            format = Logging.Format.Multiline
         }
     }.advertisements.first()
 //    val advertisement = Scanner().advertisements.first()
+    //note for future nora: it pauses here
+    println("the advertisement is: " + advertisement)
 
     println("before peripheral created")
     val peripheral = Peripheral(advertisement) { }

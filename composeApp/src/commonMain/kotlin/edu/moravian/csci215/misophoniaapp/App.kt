@@ -67,6 +67,11 @@ import androidx.compose.material3.*
 import androidx.navigation.compose.currentBackStackEntryAsState
 import edu.moravian.csci215.misophoniaapp.screens.SurveyCompanion
 import edu.moravian.csci215.misophoniaapp.screens.WifiNetworksScreen
+import misophoniaapp.composeapp.generated.resources.app_settings_button
+import misophoniaapp.composeapp.generated.resources.hp_settings_button
+import misophoniaapp.composeapp.generated.resources.survey_history_button
+import misophoniaapp.composeapp.generated.resources.wifi_settings_button
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -77,8 +82,10 @@ fun App(repository : SurveyRepository) {
     val isSetup = false
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = navBackStackEntry?.destination?.route
-    // todo make this less redundant/more efficient
-    val screensWithBottomBar = listOf("edu.moravian.csci215.misophoniaapp.screens." + AppSettings.toString(), "edu.moravian.csci215.misophoniaapp.screens." + HeadphonesSettings.toString(), "edu.moravian.csci215.misophoniaapp.screens." + Hub.toString(), "edu.moravian.csci215.misophoniaapp.screens." + SurveyHistory.toString(), "edu.moravian.csci215.misophoniaapp.screens." + WifiNetworks.toString())
+    println(currentScreen)
+    // todo make this less redundant/more efficient, add ViewSurveyScreen
+    val screensWithBottomBar = listOf("edu.moravian.csci215.misophoniaapp.screens." + AppSettings.toString(), "edu.moravian.csci215.misophoniaapp.screens." + HeadphonesSettings.toString(), "edu.moravian.csci215.misophoniaapp.screens." + Hub.toString(), "edu.moravian.csci215.misophoniaapp.screens." + SurveyHistory.toString(), "edu.moravian.csci215.misophoniaapp.screens." + WifiNetworks.toString(), "edu.moravian.csci215.misophoniaapp.screens." + ViewSurvey.toString())
+    println(screensWithBottomBar)
 
     MaterialTheme {
         Scaffold(
@@ -87,12 +94,14 @@ fun App(repository : SurveyRepository) {
                     BottomAppBar(
                         actions = {
                             Row(
-                                horizontalArrangement = Arrangement.Center
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 IconButton({ navController.navigate(Hub) }) {
                                     Icon(
                                         painterResource(Res.drawable.home_button),
-                                        "The home button",
+                                        stringResource(Res.string.home_button),
                                         Modifier.size(35.dp),
                                         Color.White
                                     )
@@ -100,7 +109,7 @@ fun App(repository : SurveyRepository) {
                                 IconButton({ navController.navigate(HeadphonesSettings) }) {
                                     Icon(
                                         painterResource(Res.drawable.headphones),
-                                        "The headphones settings button",
+                                        stringResource(Res.string.hp_settings_button),
                                         Modifier.size(35.dp),
                                         Color.White
                                     )
@@ -108,7 +117,7 @@ fun App(repository : SurveyRepository) {
                                 IconButton({ navController.navigate(SurveyHistory) }) {
                                     Icon(
                                         painterResource(Res.drawable.view_history),
-                                        "The trigger survey history button",
+                                        stringResource(Res.string.survey_history_button),
                                         Modifier.size(35.dp),
                                         Color.White
                                     )
@@ -116,7 +125,7 @@ fun App(repository : SurveyRepository) {
                                 IconButton({ navController.navigate(AppSettings) }) {
                                     Icon(
                                         painterResource(Res.drawable.settings),
-                                        "The app settings button",
+                                        stringResource(Res.string.app_settings_button),
                                         Modifier.size(35.dp),
                                         Color.White
                                     )
@@ -124,7 +133,7 @@ fun App(repository : SurveyRepository) {
                                 IconButton({ navController.navigate(WifiNetworks) }) {
                                     Icon(
                                         painterResource(Res.drawable.wifi),
-                                        "The wifi settings button",
+                                        stringResource(Res.string.wifi_settings_button),
                                         Modifier.size(35.dp),
                                         Color.White
                                     )
@@ -164,8 +173,8 @@ fun App(repository : SurveyRepository) {
                     }
                 }
                 composable<SurveyHistory> {
-                    SurveyHistoryScreen(repository) {
-                        navController.navigate(ViewSurvey(1L))
+                    SurveyHistoryScreen(repository) { surveyId ->
+                        navController.navigate(ViewSurvey(surveyId))
                     }
                 }
                 composable<ViewSurvey> { navBackStackEntry ->
