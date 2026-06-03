@@ -10,7 +10,7 @@ data object AppSettings
 
 @Composable
 fun AppSettingsScreen() {
-    Column() {
+    Column {
         Text("This is the app settings screen.")
     }
 }

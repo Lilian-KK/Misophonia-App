@@ -2,10 +2,8 @@ package edu.moravian.csci215.misophoniaapp.survey_data
 
 import kotlinx.coroutines.flow.first
 import kotlin.collections.copy
-import kotlin.text.iterator
-
-import kotlinx.coroutines.flow.first
 import kotlin.jvm.JvmName
+import kotlin.text.iterator
 
 /**
  * Saves the current survey result to the repository. This should be called when the user completes
@@ -54,7 +52,10 @@ suspend fun SurveyQuestions.save(repository: SurveyRepository) {
 /**
  * Loads the survey result with the given ID from the repository and maps it back to a Survey.
  */
-suspend fun Survey.load(surveyId: Long, repository: SurveyRepository): Survey {
+suspend fun Survey.load(
+    surveyId: Long,
+    repository: SurveyRepository,
+): Survey {
     // Load the answers for all questions
     val singleResults = repository.singleQuestionResults(surveyId).first()
     val multiResults = repository.multiQuestionResults(surveyId).first()

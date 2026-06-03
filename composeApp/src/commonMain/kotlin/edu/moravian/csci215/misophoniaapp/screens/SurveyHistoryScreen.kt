@@ -13,11 +13,11 @@ data object SurveyHistory
 @Composable
 fun SurveyHistoryScreen(
     repository: SurveyRepository,
-    onViewPastSurvey: () -> Unit
+    onViewPastSurvey: () -> Unit,
 ) {
-    Column() {
+    Column {
         Text("This is SurveyHistoryScreen.")
-        Button(onClick = onViewPastSurvey ) {
+        Button(onClick = onViewPastSurvey) {
             Text("to a past survey!")
         }
     }

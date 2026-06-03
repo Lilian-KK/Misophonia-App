@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.*
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -27,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.juul.kable.Bluetooth
@@ -37,23 +39,29 @@ import com.juul.kable.characteristicOf
 import com.juul.kable.peripheral
 import edu.moravian.csci215.misophoniaapp.screens.AppSettings
 import edu.moravian.csci215.misophoniaapp.screens.AppSettingsScreen
+import edu.moravian.csci215.misophoniaapp.screens.CreateAccount
+import edu.moravian.csci215.misophoniaapp.screens.CreateAccountScreen
+import edu.moravian.csci215.misophoniaapp.screens.ForgotPassword
+import edu.moravian.csci215.misophoniaapp.screens.ForgotPasswordScreen
 import edu.moravian.csci215.misophoniaapp.screens.HeadphonesSettings
 import edu.moravian.csci215.misophoniaapp.screens.HeadphonesSettingsScreen
 import edu.moravian.csci215.misophoniaapp.screens.Hub
 import edu.moravian.csci215.misophoniaapp.screens.HubScreen
+import edu.moravian.csci215.misophoniaapp.screens.LogIn
+import edu.moravian.csci215.misophoniaapp.screens.LoginScreen
 import edu.moravian.csci215.misophoniaapp.screens.Setup
 import edu.moravian.csci215.misophoniaapp.screens.SetupScreen
+import edu.moravian.csci215.misophoniaapp.screens.SurveyCompanion
 import edu.moravian.csci215.misophoniaapp.screens.SurveyHistory
 import edu.moravian.csci215.misophoniaapp.screens.SurveyHistoryScreen
 import edu.moravian.csci215.misophoniaapp.screens.SurveyScreen
 import edu.moravian.csci215.misophoniaapp.screens.ViewSurvey
 import edu.moravian.csci215.misophoniaapp.screens.ViewSurveyScreen
 import edu.moravian.csci215.misophoniaapp.screens.WifiNetworks
+import edu.moravian.csci215.misophoniaapp.screens.WifiNetworksScreen
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.painterResource
-
 import misophoniaapp.composeapp.generated.resources.Res
 import misophoniaapp.composeapp.generated.resources.compose_multiplatform
 import misophoniaapp.composeapp.generated.resources.headphones
@@ -61,24 +69,27 @@ import misophoniaapp.composeapp.generated.resources.home_button
 import misophoniaapp.composeapp.generated.resources.settings
 import misophoniaapp.composeapp.generated.resources.view_history
 import misophoniaapp.composeapp.generated.resources.wifi
+import org.jetbrains.compose.resources.painterResource
 import kotlin.time.Clock
-import androidx.compose.runtime.*
-import androidx.compose.material3.*
-import androidx.navigation.compose.currentBackStackEntryAsState
-import edu.moravian.csci215.misophoniaapp.screens.SurveyCompanion
-import edu.moravian.csci215.misophoniaapp.screens.WifiNetworksScreen
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 @Preview
-fun App(repository : SurveyRepository) {
+fun App(repository: SurveyRepository) {
     val navController = rememberNavController()
     val coroutineScope = rememberCoroutineScope()
     val isSetup = false
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = navBackStackEntry?.destination?.route
     // todo make this less redundant/more efficient
-    val screensWithBottomBar = listOf("edu.moravian.csci215.misophoniaapp.screens." + AppSettings.toString(), "edu.moravian.csci215.misophoniaapp.screens." + HeadphonesSettings.toString(), "edu.moravian.csci215.misophoniaapp.screens." + Hub.toString(), "edu.moravian.csci215.misophoniaapp.screens." + SurveyHistory.toString(), "edu.moravian.csci215.misophoniaapp.screens." + WifiNetworks.toString())
+    val screensWithBottomBar =
+        listOf(
+            "edu.moravian.csci215.misophoniaapp.screens." + AppSettings.toString(),
+            "edu.moravian.csci215.misophoniaapp.screens." + HeadphonesSettings.toString(),
+            "edu.moravian.csci215.misophoniaapp.screens." + Hub.toString(),
+            "edu.moravian.csci215.misophoniaapp.screens." + SurveyHistory.toString(),
+            "edu.moravian.csci215.misophoniaapp.screens." + WifiNetworks.toString(),
+        )
 
     MaterialTheme {
         Scaffold(
@@ -87,14 +98,14 @@ fun App(repository : SurveyRepository) {
                     BottomAppBar(
                         actions = {
                             Row(
-                                horizontalArrangement = Arrangement.Center
+                                horizontalArrangement = Arrangement.Center,
                             ) {
                                 IconButton({ navController.navigate(Hub) }) {
                                     Icon(
                                         painterResource(Res.drawable.home_button),
                                         "The home button",
                                         Modifier.size(35.dp),
-                                        Color.White
+                                        Color.White,
                                     )
                                 }
                                 IconButton({ navController.navigate(HeadphonesSettings) }) {
@@ -102,7 +113,7 @@ fun App(repository : SurveyRepository) {
                                         painterResource(Res.drawable.headphones),
                                         "The headphones settings button",
                                         Modifier.size(35.dp),
-                                        Color.White
+                                        Color.White,
                                     )
                                 }
                                 IconButton({ navController.navigate(SurveyHistory) }) {
@@ -110,7 +121,7 @@ fun App(repository : SurveyRepository) {
                                         painterResource(Res.drawable.view_history),
                                         "The trigger survey history button",
                                         Modifier.size(35.dp),
-                                        Color.White
+                                        Color.White,
                                     )
                                 }
                                 IconButton({ navController.navigate(AppSettings) }) {
@@ -118,7 +129,7 @@ fun App(repository : SurveyRepository) {
                                         painterResource(Res.drawable.settings),
                                         "The app settings button",
                                         Modifier.size(35.dp),
-                                        Color.White
+                                        Color.White,
                                     )
                                 }
                                 IconButton({ navController.navigate(WifiNetworks) }) {
@@ -126,35 +137,54 @@ fun App(repository : SurveyRepository) {
                                         painterResource(Res.drawable.wifi),
                                         "The wifi settings button",
                                         Modifier.size(35.dp),
-                                        Color.White
+                                        Color.White,
                                     )
                                 }
                             }
                         },
-                        containerColor = Color.Red
+                        containerColor = Color.Red,
                     )
                 }
-            }
+            },
         ) {
             NavHost(
                 navController,
-                startDestination = if (isSetup) Hub else Setup
+                startDestination = if (isSetup) Hub else Setup,
             ) {
                 composable<Setup> {
                     SetupScreen(
-                        //make sure to upgrade the navigation once Figma screens implemented
+                        onLogin = { navController.navigate(LogIn) },
+                        onCreateAccount = { navController.navigate(CreateAccount) },
+                    )
+                }
+                composable<LogIn> {
+                    LoginScreen(
                         onLogin = { navController.navigate(Hub) },
-                        onCreateAccount = { navController.navigate(Hub) }
+                        onForgotPassword = { navController.navigate(ForgotPassword) },
+                    )
+                }
+
+                composable<ForgotPassword> {
+                    ForgotPasswordScreen(
+                        onContinue = { navController.navigate(Hub) },
+                    )
+                }
+                composable<CreateAccount> {
+                    CreateAccountScreen(
+                        onCreateAccount = { phoneNumber, firstName, lastName, password ->
+                            // Handle account creation logic here
+                            navController.navigate(Hub)
+                        },
                     )
                 }
                 composable<Hub> {
-                    HubScreen() {
-                        //this one will need specific params for which survey, just basic now
+                    HubScreen {
+                        // this one will need specific params for which survey, just basic now
                         navController.navigate(SurveyCompanion)
                     }
                 }
                 composable<HeadphonesSettings> {
-                    HeadphonesSettingsScreen() {
+                    HeadphonesSettingsScreen {
                         navController.navigate(WifiNetworks)
                     }
                 }

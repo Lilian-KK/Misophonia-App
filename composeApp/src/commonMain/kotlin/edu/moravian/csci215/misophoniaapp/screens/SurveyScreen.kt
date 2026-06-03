@@ -46,7 +46,7 @@ data object SurveyCompanion
 fun SurveyScreen(
     repository: SurveyRepository,
     vm: SurveyVM = viewModel { SurveyVM(repository) },
-    onSubmission: () -> Unit
+    onSubmission: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val saving by vm.saving.collectAsState()
@@ -55,9 +55,10 @@ fun SurveyScreen(
     LaunchedEffect(Unit) { loadInitialAnswers(survey, repository, vm) }
 
     Column(
-        modifier = Modifier
-            .safeContentPadding()
-            .fillMaxSize(),
+        modifier =
+            Modifier
+                .safeContentPadding()
+                .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         SurveyView(survey, errorText != null, vm::update)
