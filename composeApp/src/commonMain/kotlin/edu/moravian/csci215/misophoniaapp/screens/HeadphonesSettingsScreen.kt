@@ -10,12 +10,10 @@ import kotlinx.serialization.Serializable
 data object HeadphonesSettings
 
 @Composable
-fun HeadphonesSettingsScreen(
-    onWifiSettings: () -> Unit
-) {
-    Column() {
+fun HeadphonesSettingsScreen(onWifiSettings: () -> Unit) {
+    Column {
         Text("This is the headphones settings screen.")
-        Button(onClick = onWifiSettings ) {
+        Button(onClick = onWifiSettings) {
             Text("to wifi networks!")
         }
     }

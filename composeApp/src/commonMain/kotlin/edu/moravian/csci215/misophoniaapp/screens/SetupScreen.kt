@@ -52,21 +52,21 @@ data object Setup
 //this is the strokes used to draw the headphones logo?
 private const val HEADPHONES_PATH =
     "M31.25 187.5V125C31.25 100.136 41.1272 76.2903 58.7087 58.7088C76.2903 41.1272 " +
-            "100.136 31.25 125 31.25C149.864 31.25 173.71 41.1272 191.291 58.7088C208.873 76.2903 " +
-            "218.75 100.136 218.75 125V187.5M218.75 197.917C218.75 203.442 216.555 208.741 " +
-            "212.648 212.648C208.741 216.555 203.442 218.75 197.917 218.75H187.5C181.975 218.75 " +
-            "176.676 216.555 172.769 212.648C168.862 208.741 166.667 203.442 166.667 197.917V166.667C" +
-            "166.667 161.141 168.862 155.842 172.769 151.935C176.676 148.028 181.975 145.833 " +
-            "187.5 145.833H218.75V197.917ZM31.25 197.917C31.25 203.442 33.4449 208.741 37.3519 " +
-            "212.648C41.2589 216.555 46.558 218.75 52.0833 218.75H62.5C68.0253 218.75 73.3244 " +
-            "216.555 77.2314 212.648C81.1384 208.741 83.3333 203.442 83.3333 197.917V166.667C" +
-            "83.3333 161.141 81.1384 155.842 77.2314 151.935C73.3244 148.028 68.0253 145.833 " +
-            "62.5 145.833H31.25V197.917Z"
+        "100.136 31.25 125 31.25C149.864 31.25 173.71 41.1272 191.291 58.7088C208.873 76.2903 " +
+        "218.75 100.136 218.75 125V187.5M218.75 197.917C218.75 203.442 216.555 208.741 " +
+        "212.648 212.648C208.741 216.555 203.442 218.75 197.917 218.75H187.5C181.975 218.75 " +
+        "176.676 216.555 172.769 212.648C168.862 208.741 166.667 203.442 166.667 197.917V166.667C" +
+        "166.667 161.141 168.862 155.842 172.769 151.935C176.676 148.028 181.975 145.833 " +
+        "187.5 145.833H218.75V197.917ZM31.25 197.917C31.25 203.442 33.4449 208.741 37.3519 " +
+        "212.648C41.2589 216.555 46.558 218.75 52.0833 218.75H62.5C68.0253 218.75 73.3244 " +
+        "216.555 77.2314 212.648C81.1384 208.741 83.3333 203.442 83.3333 197.917V166.667C" +
+        "83.3333 161.141 81.1384 155.842 77.2314 151.935C73.3244 148.028 68.0253 145.833 " +
+        "62.5 145.833H31.25V197.917Z"
 
 @Composable
 fun SetupScreen(
     onLogin: () -> Unit,
-    onCreateAccount: () -> Unit
+    onCreateAccount: () -> Unit,
 ) {
     val headphonesPath = remember {
         PathParser().parsePathString(HEADPHONES_PATH).toPath()
@@ -78,12 +78,13 @@ fun SetupScreen(
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(horizontal = 16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Text(
             text = stringResource(Res.string.welcome_message),
@@ -143,10 +144,11 @@ fun SetupScreen(
                 .fillMaxWidth()
                 .height(56.dp),
             shape = RoundedCornerShape(100.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF6750A4),
-                contentColor = Color.White
-            )
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF6750A4),
+                    contentColor = Color.White,
+                ),
         ) {
             Text(
                 text = stringResource(Res.string.create_account),

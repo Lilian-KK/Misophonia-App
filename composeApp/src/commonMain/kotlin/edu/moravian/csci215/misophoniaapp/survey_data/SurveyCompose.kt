@@ -23,9 +23,9 @@ import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.stringResource
 import misophoniaapp.composeapp.generated.resources.Res
 import misophoniaapp.composeapp.generated.resources.other
+import org.jetbrains.compose.resources.stringResource
 
 /**
  * Renders a list of [SurveyElement]s as a scrollable column. Each element is rendered using the
@@ -75,28 +75,36 @@ fun SurveyElement.Render(
     onAnswer: ((SurveyElement) -> Unit)? = null,
 ) {
     when (this) {
-        is Instruction -> InstructionElement(this, modifier, showError)
+        is Instruction -> {
+            InstructionElement(this, modifier, showError)
+        }
 
-        is QuestionWithSingleOption -> QuestionWithSingleOptionElement(
-            this,
-            modifier,
-            showError,
-            onAnswer?.let { { onAnswer(this.copy(answer = it)) } },
-        )
+        is QuestionWithSingleOption -> {
+            QuestionWithSingleOptionElement(
+                this,
+                modifier,
+                showError,
+                onAnswer?.let { { onAnswer(this.copy(answer = it)) } },
+            )
+        }
 
-        is QuestionWithMultiOptions -> QuestionWithMultiOptionsElement(
-            this,
-            modifier,
-            showError,
-            onAnswer?.let { { onAnswer(this.copy(answer = it)) } },
-        )
+        is QuestionWithMultiOptions -> {
+            QuestionWithMultiOptionsElement(
+                this,
+                modifier,
+                showError,
+                onAnswer?.let { { onAnswer(this.copy(answer = it)) } },
+            )
+        }
 
-        is QuestionWithMultiOptionsAndOther -> QuestionWithMultiOptionsAndOtherElement(
-            this,
-            modifier,
-            showError,
-            onAnswer?.let { { onAnswer(this.copy(answer = it)) } },
-        )
+        is QuestionWithMultiOptionsAndOther -> {
+            QuestionWithMultiOptionsAndOtherElement(
+                this,
+                modifier,
+                showError,
+                onAnswer?.let { { onAnswer(this.copy(answer = it)) } },
+            )
+        }
     }
 }
 
@@ -159,11 +167,12 @@ private fun CheckableButton(
     ToggleButton(
         checked,
         { onChange() },
-        shapes = ToggleButtonShapes(
-            shape = MaterialTheme.shapes.small,
-            pressedShape = MaterialTheme.shapes.small,
-            checkedShape = MaterialTheme.shapes.small,
-        ),
+        shapes =
+            ToggleButtonShapes(
+                shape = MaterialTheme.shapes.small,
+                pressedShape = MaterialTheme.shapes.small,
+                checkedShape = MaterialTheme.shapes.small,
+            ),
         contentPadding = PaddingValues(vertical = 4.dp, horizontal = 4.dp),
         modifier = modifier,
     ) {
@@ -214,9 +223,10 @@ private fun Checkboxes(
         options = options,
         modifier = modifier,
         isChecked = { answers.contains(it) },
-        onChange = onChange?.let {
-            { index -> onChange(if (answers.contains(index)) (answers - index) else (answers + index)) }
-        } ?: {},
+        onChange =
+            onChange?.let {
+                { index -> onChange(if (answers.contains(index)) (answers - index) else (answers + index)) }
+            } ?: {},
     )
 }
 
@@ -276,12 +286,13 @@ private fun QuestionWithSingleOptionElement(
 @Composable
 private fun QuestionWithSingleOptionElementPreview() {
     QuestionWithSingleOptionElement(
-        question = QuestionWithSingleOption(
-            id = "q1",
-            text = "What is your favorite color?",
-            options = listOf("Red", "Green", "Blue"),
-            answer = 2,
-        ),
+        question =
+            QuestionWithSingleOption(
+                id = "q1",
+                text = "What is your favorite color?",
+                options = listOf("Red", "Green", "Blue"),
+                answer = 2,
+            ),
     ) { }
 }
 
@@ -311,12 +322,13 @@ private fun QuestionWithMultiOptionsElement(
 @Composable
 private fun QuestionWithMultiOptionsElementPreview() {
     QuestionWithMultiOptionsElement(
-        question = QuestionWithMultiOptions(
-            id = "q1",
-            text = "Which colors do you like?",
-            options = listOf("Red", "Green", "Blue"),
-            answer = setOf(0, 2),
-        ),
+        question =
+            QuestionWithMultiOptions(
+                id = "q1",
+                text = "Which colors do you like?",
+                options = listOf("Red", "Green", "Blue"),
+                answer = setOf(0, 2),
+            ),
     ) { }
 }
 
@@ -350,11 +362,12 @@ private fun QuestionWithMultiOptionsAndOtherElement(
 @Composable
 private fun QuestionWithMultiOptionsAndOtherElementPreview() {
     QuestionWithMultiOptionsAndOtherElement(
-        question = QuestionWithMultiOptionsAndOther(
-            id = "q1",
-            text = "Which colors do you like?",
-            options = listOf("Red", "Green", "Blue"),
-            answer = Pair(setOf(0, 2), "Yellow"),
-        ),
+        question =
+            QuestionWithMultiOptionsAndOther(
+                id = "q1",
+                text = "Which colors do you like?",
+                options = listOf("Red", "Green", "Blue"),
+                answer = Pair(setOf(0, 2), "Yellow"),
+            ),
     ) { }
 }

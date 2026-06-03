@@ -10,12 +10,10 @@ import kotlinx.serialization.Serializable
 data object Hub
 
 @Composable
-fun HubScreen(
-    onSurveySelected: () -> Unit
-) {
-    Column() {
+fun HubScreen(onSurveySelected: () -> Unit) {
+    Column {
         Text("This is the hub, which will show when setup = true.")
-        Button(onClick = onSurveySelected ) {
+        Button(onClick = onSurveySelected) {
             Text("to Survey!")
         }
     }

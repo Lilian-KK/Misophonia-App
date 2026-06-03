@@ -38,7 +38,7 @@ import org.jetbrains.compose.resources.stringResource
  */
 @Serializable
 data class ViewSurvey(
-    val surveyId: Long
+    val surveyId: Long,
 )
 
 /**
@@ -68,9 +68,10 @@ fun ViewSurveyScreen(
     }
 
     Column(
-        modifier = Modifier
-            .safeContentPadding()
-            .fillMaxSize(),
+        modifier =
+            Modifier
+                .safeContentPadding()
+                .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(

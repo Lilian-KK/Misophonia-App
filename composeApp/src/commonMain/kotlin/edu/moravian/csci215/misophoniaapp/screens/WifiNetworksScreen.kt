@@ -11,4 +11,3 @@ data object WifiNetworks
 fun WifiNetworksScreen() {
     Text("This is the Wifi Networks Screen")
 }
-
