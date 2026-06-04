@@ -24,7 +24,7 @@ import edu.moravian.csci215.misophoniaapp.survey_data.Render
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyRepository
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyResultEntity
 import edu.moravian.csci215.misophoniaapp.survey_data.load
-import edu.moravian.survey.AMISOS_R_SURVEY
+import edu.moravian.csci215.misophoniaapp.surveys.AMISOS_R_SURVEY
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res

@@ -46,7 +46,13 @@ import androidx.compose.ui.unit.sp
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
 import misophoniaapp.composeapp.generated.resources.cancel_symbol
+import misophoniaapp.composeapp.generated.resources.create_account
+import misophoniaapp.composeapp.generated.resources.first_name
+import misophoniaapp.composeapp.generated.resources.last_name
+import misophoniaapp.composeapp.generated.resources.password
+import misophoniaapp.composeapp.generated.resources.phone_number
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Serializable
 data object CreateAccount
@@ -75,7 +81,7 @@ fun CreateAccountScreen(
         verticalArrangement = Arrangement.Top,
     ) {
         Text(
-            text = "Create Account",
+            text = stringResource(Res.string.create_account),
             fontSize = 28.sp,
             fontWeight = FontWeight.Normal,
             lineHeight = 36.sp,
@@ -90,7 +96,7 @@ fun CreateAccountScreen(
             FilledTextField(
                 value = phoneNumber,
                 onValueChange = { phoneNumber = it },
-                label = "Phone number",
+                label = stringResource(Res.string.phone_number),
                 keyboardType = KeyboardType.Phone,
                 onClear = { phoneNumber = "" },
             )
@@ -98,21 +104,21 @@ fun CreateAccountScreen(
             FilledTextField(
                 value = firstName,
                 onValueChange = { firstName = it },
-                label = "First Name",
+                label = stringResource(Res.string.first_name),
                 onClear = { password = "" },
             )
 
             FilledTextField(
                 value = lastName,
                 onValueChange = { lastName = it },
-                label = "Last Name",
+                label = stringResource(Res.string.last_name),
                 onClear = { lastName = "" },
             )
 
             FilledTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = "Password",
+                label = stringResource(Res.string.password),
                 keyboardType = KeyboardType.Password,
                 onClear = { password = "" },
             )
@@ -137,7 +143,7 @@ fun CreateAccountScreen(
             enabled = phoneNumber.isNotEmpty() && firstName.isNotEmpty() && lastName.isNotEmpty() && password.isNotEmpty(),
         ) {
             Text(
-                text = "Create Account",
+                text = stringResource(Res.string.create_account),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 lineHeight = 24.sp,

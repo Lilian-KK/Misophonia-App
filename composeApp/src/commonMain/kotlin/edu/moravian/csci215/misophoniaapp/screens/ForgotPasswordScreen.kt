@@ -45,6 +45,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.serialization.Serializable
+import misophoniaapp.composeapp.generated.resources.Res
+import misophoniaapp.composeapp.generated.resources.continue_
+import misophoniaapp.composeapp.generated.resources.didnt_get_code
+import misophoniaapp.composeapp.generated.resources.enter_code
+import misophoniaapp.composeapp.generated.resources.forgot_password
+import misophoniaapp.composeapp.generated.resources.phone_number
+import misophoniaapp.composeapp.generated.resources.send_another_code
+import misophoniaapp.composeapp.generated.resources.send_code
+import misophoniaapp.composeapp.generated.resources.verify_for_pw_creation
+import org.jetbrains.compose.resources.stringResource
 
 @Serializable
 data object ForgotPassword
@@ -66,7 +76,7 @@ fun ForgotPasswordScreen(onContinue: () -> Unit = {}) {
     ) {
         item {
             Text(
-                text = "Forgot Password",
+                text = stringResource(Res.string.forgot_password),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Normal,
                 lineHeight = 36.sp,
@@ -82,7 +92,7 @@ fun ForgotPasswordScreen(onContinue: () -> Unit = {}) {
 
         item {
             Text(
-                text = "We need to verify it's you to create a new password.",
+                text = stringResource(Res.string.verify_for_pw_creation),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Normal,
                 lineHeight = 20.sp,
@@ -101,7 +111,7 @@ fun ForgotPasswordScreen(onContinue: () -> Unit = {}) {
             FilledTextField(
                 value = phoneNumber,
                 onValueChange = { phoneNumber = it },
-                label = "Phone number",
+                label = stringResource(Res.string.phone_number),
                 keyboardType = KeyboardType.Phone,
                 onClear = { phoneNumber = "" },
             )
@@ -127,7 +137,7 @@ fun ForgotPasswordScreen(onContinue: () -> Unit = {}) {
                         ),
                 ) {
                     Text(
-                        text = "Send Code",
+                        text = stringResource(Res.string.send_code),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         lineHeight = 24.sp,
@@ -144,7 +154,7 @@ fun ForgotPasswordScreen(onContinue: () -> Unit = {}) {
 
             item {
                 Text(
-                    text = "Enter the 6-digit code sent to your phone number",
+                    text = stringResource(Res.string.enter_code),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
                     lineHeight = 20.sp,
@@ -195,7 +205,7 @@ fun ForgotPasswordScreen(onContinue: () -> Unit = {}) {
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     Text(
-                        text = "Didn't get the code? ",
+                        text = stringResource(Res.string.didnt_get_code),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Normal,
                         lineHeight = 20.sp,
@@ -203,7 +213,7 @@ fun ForgotPasswordScreen(onContinue: () -> Unit = {}) {
                         color = Color.Black,
                     )
                     Text(
-                        text = "Send another code",
+                        text = stringResource(Res.string.send_another_code),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Normal,
                         lineHeight = 20.sp,
@@ -234,7 +244,7 @@ fun ForgotPasswordScreen(onContinue: () -> Unit = {}) {
                         ),
                 ) {
                     Text(
-                        text = "Continue",
+                        text = stringResource(Res.string.continue_),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         lineHeight = 24.sp,

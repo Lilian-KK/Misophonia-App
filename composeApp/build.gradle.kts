@@ -10,6 +10,12 @@ plugins {
     alias(libs.plugins.ksp) // **ADDED** for Room
     alias(libs.plugins.androidx.room) // **ADDED** for Room
 }
+//
+//allprojects {
+//    repositories {
+//        maven { url = uri("https://jitpack.io")}
+//    }
+//}
 
 kotlin {
     androidTarget {

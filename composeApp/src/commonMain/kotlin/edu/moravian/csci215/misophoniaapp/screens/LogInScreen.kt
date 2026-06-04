@@ -45,7 +45,13 @@ import androidx.compose.ui.unit.sp
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
 import misophoniaapp.composeapp.generated.resources.cancel_symbol
+import misophoniaapp.composeapp.generated.resources.clear
+import misophoniaapp.composeapp.generated.resources.forgot_password
+import misophoniaapp.composeapp.generated.resources.login
+import misophoniaapp.composeapp.generated.resources.password
+import misophoniaapp.composeapp.generated.resources.phone_number
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 val SurfaceContainerHighest = Color(0xFFE6E0E9)
 val OnSurfaceVariant = Color(0xFF49454F)
@@ -77,7 +83,7 @@ fun LoginScreen(
             verticalArrangement = Arrangement.spacedBy(32.dp),
         ) {
             Text(
-                text = "Log In",
+                text = stringResource(Res.string.login),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Normal,
                 lineHeight = 36.sp,
@@ -109,7 +115,7 @@ fun LoginScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = Primary),
             ) {
                 Text(
-                    text = "Log In",
+                    text = stringResource(Res.string.login),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
                     lineHeight = 24.sp,
@@ -130,7 +136,7 @@ private fun LoginFields(onForgotPassword: () -> Unit) {
         FilledTextField(
             value = phoneNumber,
             onValueChange = { phoneNumber = it },
-            label = "Phone number",
+            label = stringResource(Res.string.phone_number),
             keyboardType = KeyboardType.Phone,
             onClear = { phoneNumber = "" },
         )
@@ -139,7 +145,7 @@ private fun LoginFields(onForgotPassword: () -> Unit) {
             FilledTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = "Password",
+                label = stringResource(Res.string.password),
                 keyboardType = KeyboardType.Password,
                 isPassword = true,
                 onClear = { password = "" },
@@ -156,7 +162,7 @@ private fun LoginFields(onForgotPassword: () -> Unit) {
                             .PaddingValues(0.dp),
                 ) {
                     Text(
-                        text = "Forgot Password?",
+                        text = stringResource(Res.string.forgot_password),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
                         lineHeight = 16.sp,
@@ -223,7 +229,7 @@ fun FilledTextField(
                 IconButton(onClick = onClear, modifier = Modifier.size(48.dp)) {
                     Image(
                         painter = painterResource(Res.drawable.cancel_symbol),
-                        contentDescription = "Clear",
+                        contentDescription = stringResource(Res.string.clear),
                     )
                 }
             }

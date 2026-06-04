@@ -63,13 +63,18 @@ import edu.moravian.csci215.misophoniaapp.survey_data.SurveyRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import misophoniaapp.composeapp.generated.resources.Res
+import misophoniaapp.composeapp.generated.resources.app_settings_button
 import misophoniaapp.composeapp.generated.resources.compose_multiplatform
 import misophoniaapp.composeapp.generated.resources.headphones
 import misophoniaapp.composeapp.generated.resources.home_button
+import misophoniaapp.composeapp.generated.resources.hp_settings_button
 import misophoniaapp.composeapp.generated.resources.settings
+import misophoniaapp.composeapp.generated.resources.survey_history_button
 import misophoniaapp.composeapp.generated.resources.view_history
 import misophoniaapp.composeapp.generated.resources.wifi
+import misophoniaapp.composeapp.generated.resources.wifi_settings_button
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
