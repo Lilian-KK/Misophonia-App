@@ -52,7 +52,8 @@ fun SurveyScreen(
     val saving by vm.saving.collectAsState()
     val errorText by vm.errorText.collectAsState()
     val survey by vm.survey.collectAsState()
-    LaunchedEffect(Unit) { loadInitialAnswers(survey, repository, vm) }
+    //TODO: loadinitialanswers() should only run if AMISOSR survey is the current survey type
+    //LaunchedEffect(Unit) { loadInitialAnswers(survey, repository, vm) }
 
     Column(
         modifier =
