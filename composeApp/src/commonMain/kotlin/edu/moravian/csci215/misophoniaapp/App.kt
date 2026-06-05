@@ -93,7 +93,7 @@ fun App(repository: SurveyRepository) {
     MaterialTheme {
         Scaffold(
             bottomBar = {
-                if (screensWithBottomBar.contains(currentScreen)) {
+                if (screensWithBottomBar.contains(currentScreen) || (currentScreen?.contains("ViewSurvey") == true)) {
                     BottomAppBar(
                         actions = {
                             Row(

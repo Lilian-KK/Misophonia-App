@@ -18,7 +18,7 @@ class SurveyVM(
 ) : ViewModel() {
     private val _errorText = MutableStateFlow<String?>(null)
     val errorText: StateFlow<String?> = _errorText
-    private val _survey = MutableStateFlow(DUKE_SURVEY)
+    private val _survey = MutableStateFlow(AMISOS_R_SURVEY)
     val survey: StateFlow<Survey> = _survey
 
     private val _saving = MutableStateFlow(false)

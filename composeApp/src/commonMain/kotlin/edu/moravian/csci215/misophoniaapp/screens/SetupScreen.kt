@@ -161,17 +161,21 @@ fun SetupScreen(
     }
 }
 
+//to do:
+//filter out unnamed devices, show the user a list of all available peripherals to select
+//nimBLE
+//let them connect to one, once they connect to it display information (characteristics?) about it
 suspend fun scanKable() {
     println("proof that testingkable is running")
     val advertisement = Scanner {
         filters {
             match {
                 println("before services created")
-                //filter out unnamed devices, show the user a list of all available peripherals to select
-                //nimBLE
-                //let them connect to one, once they connect to it display information (characteristics?) about it
                 services = listOf(Bluetooth.BaseUuid + 0x180F) //battery service
                 println("these are the services" + services)
+            }
+            match {
+                Filter.Name.Exact("nimBLE")
             }
         }
         logging {
