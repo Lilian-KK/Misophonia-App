@@ -64,6 +64,12 @@ kotlin {
             api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0") //added for Kable
             implementation("com.juul.kable:kable-core:0.35.0") //added for Kable
 
+            implementation(libs.ktor.client.core) // added for ktor
+            implementation(libs.ktor.client.cio) // added for ktor
+
+            implementation(libs.ktor.client.content.negotiation) // added for ktor
+            implementation(libs.ktor.serialization.kotlinx.json) // added for ktor
+
             //implementation("com.github.jens-muenker:fuzzywuzzy-kotlin:1.0.1") //added for fuzzywuzzy string comparison
         }
         commonTest.dependencies {

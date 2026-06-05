@@ -172,7 +172,7 @@ fun App(repository: SurveyRepository) {
                 }
                 composable<CreateAccount> {
                     CreateAccountScreen(
-                        onCreateAccount = { phoneNumber, firstName, lastName, password ->
+                        onCreateAccount = { phoneNumber, name, password ->
                             // Handle account creation logic here
                             navController.navigate(Hub)
                         },

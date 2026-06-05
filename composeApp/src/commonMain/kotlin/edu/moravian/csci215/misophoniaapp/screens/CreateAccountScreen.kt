@@ -47,8 +47,7 @@ import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
 import misophoniaapp.composeapp.generated.resources.cancel_symbol
 import misophoniaapp.composeapp.generated.resources.create_account
-import misophoniaapp.composeapp.generated.resources.first_name
-import misophoniaapp.composeapp.generated.resources.last_name
+import misophoniaapp.composeapp.generated.resources.name
 import misophoniaapp.composeapp.generated.resources.password
 import misophoniaapp.composeapp.generated.resources.phone_number
 import org.jetbrains.compose.resources.painterResource
@@ -59,11 +58,10 @@ data object CreateAccount
 
 @Composable
 fun CreateAccountScreen(
-    onCreateAccount: (phoneNumber: String, firstName: String, lastName: String, password: String) -> Unit = { _, _, _, _ -> },
+    onCreateAccount: (phoneNumber: String, name: String, password: String) -> Unit = { _, _, _ -> },
 ) {
     var phoneNumber by remember { mutableStateOf("") }
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     val primaryColor = Color(0xFF6750A4)
@@ -102,18 +100,13 @@ fun CreateAccountScreen(
             )
 
             FilledTextField(
-                value = firstName,
-                onValueChange = { firstName = it },
-                label = stringResource(Res.string.first_name),
+                value = name,
+                onValueChange = { name = it },
+                label = stringResource(Res.string.name),
                 onClear = { password = "" },
             )
 
-            FilledTextField(
-                value = lastName,
-                onValueChange = { lastName = it },
-                label = stringResource(Res.string.last_name),
-                onClear = { lastName = "" },
-            )
+
 
             FilledTextField(
                 value = password,
@@ -128,7 +121,7 @@ fun CreateAccountScreen(
 
         Button(
             onClick = {
-                onCreateAccount(phoneNumber, firstName, lastName, password)
+                onCreateAccount(phoneNumber, name, password)
             },
             modifier =
                 Modifier
@@ -140,7 +133,7 @@ fun CreateAccountScreen(
                     containerColor = primaryColor,
                     contentColor = Color.White,
                 ),
-            enabled = phoneNumber.isNotEmpty() && firstName.isNotEmpty() && lastName.isNotEmpty() && password.isNotEmpty(),
+            enabled = phoneNumber.isNotEmpty() && name.isNotEmpty() && password.isNotEmpty(),
         ) {
             Text(
                 text = stringResource(Res.string.create_account),
