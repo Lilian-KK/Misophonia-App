@@ -15,10 +15,11 @@ import org.jetbrains.compose.resources.getString
  */
 class SurveyVM(
     val repository: SurveyRepository,
+    val surveyType: List<SurveyElement>
 ) : ViewModel() {
     private val _errorText = MutableStateFlow<String?>(null)
     val errorText: StateFlow<String?> = _errorText
-    private val _survey = MutableStateFlow(AMISOS_R_SURVEY)
+    private val _survey = MutableStateFlow(surveyType)
     val survey: StateFlow<Survey> = _survey
 
     private val _saving = MutableStateFlow(false)

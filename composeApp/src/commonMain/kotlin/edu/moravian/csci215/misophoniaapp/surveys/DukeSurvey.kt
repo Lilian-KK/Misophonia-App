@@ -119,7 +119,7 @@ val DUKE_SURVEY: List<SurveyElement> =
             "Note: If items 1-15 are marked \"no\" and item 16 is marked \"yes\", do not move forward with the following sections.",
         ),
         //this one is strange on the pdf, is it a real question?
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "howOftenBothered",
             "In the past month, on average across ALL bothersome sounds, rate how often you were bothered by a sound/sounds.",
             listOf(
@@ -141,42 +141,42 @@ val DUKE_SURVEY: List<SurveyElement> =
             "In the past month on average, when intensely bothered by a sound or sounds, please rate how often you felt each of the following:"
         ),
         //these have a score attribute attached to them
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "felt1",
             "I felt angry.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "felt2",
             "I felt anxious.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "felt3",
             "I felt disgusted.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "felt4",
             "I felt hateful.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "felt5",
             "I felt panic.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "felt6",
             "I felt hostile.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "felt7",
             "I felt jittery.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "felt8",
             "I felt frustrated.",
             SCALE_OPTIONS,
@@ -185,27 +185,27 @@ val DUKE_SURVEY: List<SurveyElement> =
             "howOftenTheFollowingHappened",
             "In the past month on average, when intensely bothered by a sound or sounds, please rate how often each of the following happened to you."
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "happened1",
             "I became rigid or stiff.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "happened2",
             "I trembled or shuddered.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "happened3",
             "My heart pounded or raced.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "happened4",
             "I started breathing intensely or forcefully.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "happened5",
             "I reflexively jumped.",
             SCALE_OPTIONS,
@@ -214,52 +214,52 @@ val DUKE_SURVEY: List<SurveyElement> =
             "howOftenThoughtsHad",
             "In the past month on average, when intensely bothered by a sound or sounds, please rate how often you had each of the following thoughts."
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "thought1",
             "“I am helpless.”",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "thought2",
             "“I want to cry.”",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "thought3",
             "“How do I make this sound stop?”",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "thought4",
             "“Everything is awful.”",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "thought5",
             "“I cannot handle this.”",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "thought6",
             "“I need to get away from the sound.”",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "thought7",
             "“I would do anything to make it stop.”",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "thought8",
             "I thought about screaming at, yelling at, or telling off the person making the sound.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "thought9",
             "I thought about pushing, poking, shoving, etc. the person making the sound.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "thought10",
             "I thought about physically hurting the person making the sound.",
             SCALE_OPTIONS,
@@ -268,32 +268,32 @@ val DUKE_SURVEY: List<SurveyElement> =
             "howOftenBeforeHearingSound",
             "Please rate how often you did the following in the past month, on average, BEFORE HEARING a bothersome sound."
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "beforehearing1",
              "I avoided certain people, places, or things so I would not have to hear sounds I dislike.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "beforehearing2",
             "I used a different sound to drown the bothersome sound (e.g. turned on TV).",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "beforehearing3",
             "I used strategies to make myself less bothered by sounds I might hear (e.g. deep breathing, meditation, visualization).",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "beforehearing4",
             "I was on guard for bothersome sounds",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "beforehearing5",
             "I distracted myself so as not to be bothered by a sound I might hear.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "beforehearing6",
             "I made a plan to cope with bothersome sounds if they occurred.",
             SCALE_OPTIONS,
@@ -302,52 +302,52 @@ val DUKE_SURVEY: List<SurveyElement> =
             "howOftenWhileHearingSound",
             "Please rate how often you did the following in the past month, on average, WHILE HEARING a bothersome sound."
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "whilehearing1",
             "I blocked the sound (e.g., covered ears with hands, headphones, ear plugs)",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "whilehearing2",
             "I used strategies to calm myself (e.g., self‐talk, breathing exercises).",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "whilehearing3",
             "I focused my attention on an activity (e.g., watched TV or videos).",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "whilehearing4",
             "I produced an alternate sound (e.g., humming).",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "whilehearing5",
             "I reminded myself that it could be worse.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "whilehearing6",
             "I increased the background noise to cover up the bothersome sound (e.g. turned on TV, rolled down car window)",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "whilehearing7",
             "I changed my way of thinking about the sound.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "whilehearing8",
             "I looked away from the source of the sound.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "whilehearing9",
             "I listened to music or a different sound.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "whilehearing10",
             "I mindfully focused on current sensations without judgement.",
             SCALE_OPTIONS,
@@ -356,27 +356,27 @@ val DUKE_SURVEY: List<SurveyElement> =
             "howOftenAterHearingSound",
             "Please rate how often you did the following in the past month, on average, AFTER HEARING a bothersome sound."
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "afterhearing1",
             "I did something to comfort myself (e.g. exercised, went somewhere calming, pet animals).",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "afterhearing2",
             "I listened to a comforting sound (e.g. white noise, music).",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "afterhearing3",
             "I did some relaxation exercises (e.g. deep breathing, meditation).",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "afterhearing4",
             "I used the sight, smell, or touch of an object to soothe myself (e.g. looked at a soothing picture, smelled a scent, or touched a soft blanket).",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "afterhearing5",
             "I thought about strategies to help me cope better next time.",
             SCALE_OPTIONS,
@@ -385,62 +385,62 @@ val DUKE_SURVEY: List<SurveyElement> =
             "howMuchNegativeEffect",
             "Please rate the extent to which the bothersome sound/sounds and your reactions to them negatively affected the following in the past month, on average."
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "negativeeffect1",
             "My ability to be with other people.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "negativeeffect2",
             "My performance at work or school.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "negativeeffect3",
             "The quality of my romantic relationships.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "negativeeffect4",
             "My ability to function in daily activities without help.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "negativeeffect5",
             "How much I enjoy spending time with my family.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "negativeeffect6",
             "My ability to work with others.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "negativeeffect7",
             "My self‐esteem.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "negativeeffect8",
             "My ability to maintain employment.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "negativeeffect9",
             "The quality of my relationships with my friends",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "negativeeffect10",
             "How connected I feel to other people.",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "negativeeffect11",
             "My ability to live with other people (e.g. roommate, partner).",
             SCALE_OPTIONS,
         ),
-        QuestionWithMultiOptions(
+        QuestionWithSingleOption(
             "negativeeffect12",
             "My ability to “be myself”.",
             SCALE_OPTIONS,

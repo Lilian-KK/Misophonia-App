@@ -10,12 +10,6 @@ plugins {
     alias(libs.plugins.ksp) // **ADDED** for Room
     alias(libs.plugins.androidx.room) // **ADDED** for Room
 }
-//
-//allprojects {
-//    repositories {
-//        maven { url = uri("https://jitpack.io")}
-//    }
-//}
 
 kotlin {
     androidTarget {
@@ -69,8 +63,9 @@ kotlin {
 
             implementation(libs.ktor.client.content.negotiation) // added for ktor
             implementation(libs.ktor.serialization.kotlinx.json) // added for ktor
+            implementation("io.ktor:ktor-client-auth:3.5.0") // added for ktor auths
 
-            //implementation("com.github.jens-muenker:fuzzywuzzy-kotlin:1.0.1") //added for fuzzywuzzy string comparison
+            implementation("ca.solo-studios:kt-fuzzy:0.1.0") // added for fuzzy kotlin string comparison
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

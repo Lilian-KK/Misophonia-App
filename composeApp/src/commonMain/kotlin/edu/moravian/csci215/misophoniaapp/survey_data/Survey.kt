@@ -1,9 +1,16 @@
 package edu.moravian.csci215.misophoniaapp.survey_data
 
+import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.StringResource
 import kotlin.collections.map
 import kotlin.jvm.JvmName
+
+enum class SurveyType{
+    AMISOSR_SURVEY,
+    DUKE_SURVEY,
+    TRIGGER_LOG_SURVEY
+}
 
 /**
  * A survey is a list of [SurveyElement]s. The order of the elements in the list determines the

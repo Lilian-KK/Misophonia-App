@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -59,7 +60,9 @@ import edu.moravian.csci215.misophoniaapp.screens.ViewSurvey
 import edu.moravian.csci215.misophoniaapp.screens.ViewSurveyScreen
 import edu.moravian.csci215.misophoniaapp.screens.WifiNetworks
 import edu.moravian.csci215.misophoniaapp.screens.WifiNetworksScreen
+import edu.moravian.csci215.misophoniaapp.survey_data.SurveyElement
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyRepository
+import edu.moravian.csci215.misophoniaapp.survey_data.SurveyVM
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import misophoniaapp.composeapp.generated.resources.Res
@@ -179,9 +182,8 @@ fun App(repository: SurveyRepository) {
                     )
                 }
                 composable<Hub> {
-                    HubScreen {
-                        // this one will need specific params for which survey, just basic now
-                        navController.navigate(SurveyCompanion)
+                    HubScreen { surveyType ->
+                        navController.navigate(SurveyCompanion(surveyType))
                     }
                 }
                 composable<HeadphonesSettings> {
@@ -189,8 +191,9 @@ fun App(repository: SurveyRepository) {
                         navController.navigate(WifiNetworks)
                     }
                 }
-                composable<SurveyCompanion> {
-                    SurveyScreen(repository) {
+                composable<SurveyCompanion> { navBackStackEntry ->
+                    val surveyType = navBackStackEntry.toRoute<SurveyCompanion>().surveyType
+                    SurveyScreen(repository, surveyType) {
                         navController.navigate(SurveyHistory)
                     }
                 }

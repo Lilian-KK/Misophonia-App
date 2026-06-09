@@ -25,10 +25,15 @@ import edu.moravian.csci215.misophoniaapp.survey_data.QuestionWithMultiOptions
 import edu.moravian.csci215.misophoniaapp.survey_data.QuestionWithMultiOptionsAndOther
 import edu.moravian.csci215.misophoniaapp.survey_data.Render
 import edu.moravian.csci215.misophoniaapp.survey_data.Survey
+import edu.moravian.csci215.misophoniaapp.survey_data.SurveyElement
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyRepository
+import edu.moravian.csci215.misophoniaapp.survey_data.SurveyType
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyVM
 import edu.moravian.csci215.misophoniaapp.survey_data.questions
 import edu.moravian.csci215.misophoniaapp.survey_data.update
+import edu.moravian.csci215.misophoniaapp.surveys.AMISOS_R_SURVEY
+import edu.moravian.csci215.misophoniaapp.surveys.DUKE_SURVEY
+import edu.moravian.csci215.misophoniaapp.surveys.TRIGGER_LOG_SURVEY
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -37,7 +42,9 @@ import misophoniaapp.composeapp.generated.resources.submit
 import org.jetbrains.compose.resources.stringResource
 
 @Serializable
-data object SurveyCompanion
+data class SurveyCompanion (
+    val surveyType: SurveyType
+)
 
 /**
  * Displays the survey screen, which consists of a column with the survey view and a submit button.
@@ -45,9 +52,17 @@ data object SurveyCompanion
 @Composable
 fun SurveyScreen(
     repository: SurveyRepository,
-    vm: SurveyVM = viewModel { SurveyVM(repository) },
+    surveyType: SurveyType,
     onSubmission: () -> Unit,
 ) {
+    val vm: SurveyVM = viewModel { SurveyVM (
+        repository,
+        when (surveyType) {
+            SurveyType.AMISOSR_SURVEY -> AMISOS_R_SURVEY
+            SurveyType.DUKE_SURVEY -> DUKE_SURVEY
+            SurveyType.TRIGGER_LOG_SURVEY -> TRIGGER_LOG_SURVEY
+        } )
+    }
     val scope = rememberCoroutineScope()
     val saving by vm.saving.collectAsState()
     val errorText by vm.errorText.collectAsState()
