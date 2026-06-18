@@ -15,7 +15,7 @@ import kotlinx.coroutines.IO
         SurveyQuestionSingleAnswerResultEntity::class,
         SurveyQuestionMultiAnswerResultEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 @ConstructedBy(SurveyDatabaseConstructor::class)

@@ -60,11 +60,20 @@ import edu.moravian.csci215.misophoniaapp.screens.ViewSurvey
 import edu.moravian.csci215.misophoniaapp.screens.ViewSurveyScreen
 import edu.moravian.csci215.misophoniaapp.screens.WifiNetworks
 import edu.moravian.csci215.misophoniaapp.screens.WifiNetworksScreen
+import edu.moravian.csci215.misophoniaapp.server_data.ServerVM
+import edu.moravian.csci215.misophoniaapp.server_data.logIn
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyElement
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyRepository
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyVM
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.http.URLProtocol
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import misophoniaapp.composeapp.generated.resources.Res
 import misophoniaapp.composeapp.generated.resources.app_settings_button
 import misophoniaapp.composeapp.generated.resources.compose_multiplatform
@@ -87,6 +96,22 @@ fun App(repository: SurveyRepository) {
     val coroutineScope = rememberCoroutineScope()
     val isSetup = false
     val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+    val httpClient = remember {
+        HttpClient(CIO) {
+            defaultRequest {
+                url {
+                    protocol = URLProtocol.HTTP
+                    host = "10.0.2.2"
+                    port = 8000
+                }
+            }
+            install(ContentNegotiation) {
+                json(Json { ignoreUnknownKeys = true })
+            }
+        }
+    }
+
     val currentScreen = navBackStackEntry?.destination?.route
     println(currentScreen)
     // todo make this less redundant/more efficient, add ViewSurveyScreen
@@ -162,12 +187,17 @@ fun App(repository: SurveyRepository) {
                     )
                 }
                 composable<LogIn> {
+                    //val vm: ServerVM = viewModel()
                     LoginScreen(
-                        onLogin = { navController.navigate(Hub) },
+                        onLogin = { phoneNumber: String, password: String ->
+                            coroutineScope.launch {
+                                logIn(httpClient, phoneNumber, password)
+                            }
+                        },
+                        toHub = { navController.navigate(Hub) },
                         onForgotPassword = { navController.navigate(ForgotPassword) },
                     )
                 }
-
                 composable<ForgotPassword> {
                     ForgotPasswordScreen(
                         onContinue = { navController.navigate(Hub) },

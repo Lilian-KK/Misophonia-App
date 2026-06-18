@@ -96,14 +96,12 @@ fun CreateAccountScreen(
                 onValueChange = { phoneNumber = it },
                 label = stringResource(Res.string.phone_number),
                 keyboardType = KeyboardType.Phone,
-                onClear = { phoneNumber = "" },
             )
 
             FilledTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = stringResource(Res.string.name),
-                onClear = { password = "" },
+                label = stringResource(Res.string.name)
             )
 
 
@@ -113,7 +111,6 @@ fun CreateAccountScreen(
                 onValueChange = { password = it },
                 label = stringResource(Res.string.password),
                 keyboardType = KeyboardType.Password,
-                onClear = { password = "" },
             )
         }
 

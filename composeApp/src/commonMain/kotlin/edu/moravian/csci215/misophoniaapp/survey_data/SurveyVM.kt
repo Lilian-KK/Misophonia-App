@@ -3,6 +3,7 @@ package edu.moravian.csci215.misophoniaapp.survey_data
 import androidx.lifecycle.ViewModel
 import edu.moravian.csci215.misophoniaapp.surveys.AMISOS_R_SURVEY
 import edu.moravian.csci215.misophoniaapp.surveys.DUKE_SURVEY
+import edu.moravian.csci215.misophoniaapp.surveys.TRIGGER_LOG_SURVEY
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
@@ -34,7 +35,12 @@ class SurveyVM(
         if (survey.value.questions.hasErrors) {
             _errorText.value = getString(Res.string.answer_all)
         } else {
-            survey.value.save(repository)
+            survey.value.save(when(surveyType) {
+                AMISOS_R_SURVEY -> SurveyType.AMISOSR_SURVEY
+                DUKE_SURVEY -> SurveyType.DUKE_SURVEY
+                TRIGGER_LOG_SURVEY -> SurveyType.TRIGGER_LOG_SURVEY
+                else -> throw IllegalArgumentException("Unknown Survey Type")
+            }, repository)
             onCompleted()
         }
         _saving.value = false

@@ -113,7 +113,6 @@ fun ForgotPasswordScreen(onContinue: () -> Unit = {}) {
                 onValueChange = { phoneNumber = it },
                 label = stringResource(Res.string.phone_number),
                 keyboardType = KeyboardType.Phone,
-                onClear = { phoneNumber = "" },
             )
         }
 

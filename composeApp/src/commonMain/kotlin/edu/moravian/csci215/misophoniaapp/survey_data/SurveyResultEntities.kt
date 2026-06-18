@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class SurveyResultEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
+    val surveyType: SurveyType,
     val completedAtEpochMillis: Long,
     val totalScore: Int,
 )

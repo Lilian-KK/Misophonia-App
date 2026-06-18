@@ -25,6 +25,7 @@ import misophoniaapp.composeapp.generated.resources.date
 import misophoniaapp.composeapp.generated.resources.history
 import misophoniaapp.composeapp.generated.resources.no_history
 import misophoniaapp.composeapp.generated.resources.score
+import misophoniaapp.composeapp.generated.resources.survey_type
 import org.jetbrains.compose.resources.stringResource
 
 @Serializable
@@ -56,6 +57,7 @@ fun SurveyHistoryScreen(
             items(entries, key = { it.id }) { result ->
                 Card(modifier = Modifier.fillMaxWidth().clickable { onViewPastSurvey(result.id) }) {
                     Column(modifier = Modifier.padding(12.dp)) {
+                        Text(stringResource(Res.string.survey_type, result.surveyType))
                         Text(stringResource(Res.string.date, formatEpochMillis(result.completedAtEpochMillis)))
                         Text(stringResource(Res.string.score, result.totalScore))
                     }

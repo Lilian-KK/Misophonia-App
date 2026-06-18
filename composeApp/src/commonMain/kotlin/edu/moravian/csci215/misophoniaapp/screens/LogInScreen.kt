@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.PathNode
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -42,6 +43,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.ktor.client.HttpClient
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
 import misophoniaapp.composeapp.generated.resources.cancel_symbol
@@ -62,9 +64,13 @@ data object LogIn
 
 @Composable
 fun LoginScreen(
-    onLogin: () -> Unit = {},
-    onForgotPassword: () -> Unit = {},
+    onLogin: (String, String) -> Unit,
+    toHub: () -> Unit,
+    onForgotPassword: () -> Unit,
 ) {
+    val (phoneNumber, setPhoneNumber) = remember { mutableStateOf("") }
+    val (password, setPassword) = remember { mutableStateOf("")}
+
     Column(
         modifier =
             Modifier
@@ -96,7 +102,14 @@ fun LoginScreen(
                         .padding(top = 8.dp),
             )
 
-            LoginFields(onForgotPassword = onForgotPassword)
+            LoginFields(
+                onForgotPassword = onForgotPassword,
+                phoneNumber = phoneNumber,
+                setPhoneNumber = setPhoneNumber,
+                password = password,
+                setPassword = setPassword
+            )
+//            LoginFields(onForgotPassword = onForgotPassword)
         }
 
         Box(
@@ -106,7 +119,8 @@ fun LoginScreen(
                     .padding(horizontal = 16.dp, vertical = 16.dp),
         ) {
             Button(
-                onClick = onLogin,
+                onClick = { onLogin(phoneNumber, password)
+                    toHub() },
                 modifier =
                     Modifier
                         .fillMaxWidth()
@@ -128,27 +142,29 @@ fun LoginScreen(
 }
 
 @Composable
-private fun LoginFields(onForgotPassword: () -> Unit) {
-    var phoneNumber by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+private fun LoginFields(
+    onForgotPassword: () -> Unit,
+    phoneNumber: String,
+    setPhoneNumber: (String) -> Unit,
+    password: String,
+    setPassword: (String) -> Unit
+) {
 
     Column(verticalArrangement = Arrangement.spacedBy(32.dp)) {
         FilledTextField(
             value = phoneNumber,
-            onValueChange = { phoneNumber = it },
+            onValueChange = setPhoneNumber,
             label = stringResource(Res.string.phone_number),
             keyboardType = KeyboardType.Phone,
-            onClear = { phoneNumber = "" },
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             FilledTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = setPassword,
                 label = stringResource(Res.string.password),
                 keyboardType = KeyboardType.Password,
                 isPassword = true,
-                onClear = { password = "" },
             )
 
             Row(
@@ -183,7 +199,6 @@ fun FilledTextField(
     label: String,
     keyboardType: KeyboardType = KeyboardType.Text,
     isPassword: Boolean = false,
-    onClear: () -> Unit,
 ) {
     Column {
         Box(
@@ -226,7 +241,7 @@ fun FilledTextField(
                                 .height(28.dp),
                     )
                 }
-                IconButton(onClick = onClear, modifier = Modifier.size(48.dp)) {
+                IconButton(onClick = { onValueChange("") }, modifier = Modifier.size(48.dp)) {
                     Image(
                         painter = painterResource(Res.drawable.cancel_symbol),
                         contentDescription = stringResource(Res.string.clear),
@@ -238,8 +253,8 @@ fun FilledTextField(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    LoginScreen()
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun LoginScreenPreview() {
+//    LoginScreen()
+//}

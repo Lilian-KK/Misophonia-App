@@ -10,15 +10,15 @@ import kotlin.text.iterator
  * the survey.
  */
 @JvmName("saveSurvey")
-suspend fun Survey.save(repository: SurveyRepository) = this.questions.save(repository)
+suspend fun Survey.save(surveyType: SurveyType, repository: SurveyRepository) = this.questions.save(surveyType, repository)
 
 /**
  * Saves the current survey result to the repository. This should be called when the user completes
  * the survey.
  */
 @JvmName("saveSurveyQuestions")
-suspend fun SurveyQuestions.save(repository: SurveyRepository) {
-    val surveyId = repository.saveResult(this.score)
+suspend fun SurveyQuestions.save(surveyType: SurveyType, repository: SurveyRepository) {
+    val surveyId = repository.saveResult(this.score, surveyType)
     for (question in this) {
         when (question) {
             is QuestionWithSingleOption -> {

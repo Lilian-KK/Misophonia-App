@@ -1,9 +1,14 @@
 package edu.moravian.csci215.misophoniaapp.survey_data
 
+import edu.moravian.csci215.misophoniaapp.surveys.AMISOS_R_SURVEY
+import edu.moravian.csci215.misophoniaapp.surveys.DUKE_SURVEY
+import edu.moravian.csci215.misophoniaapp.surveys.TRIGGER_LOG_SURVEY
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 import kotlin.collections.map
+import kotlin.contracts.InvocationKind
 import kotlin.jvm.JvmName
 
 enum class SurveyType{
@@ -137,6 +142,33 @@ data class QuestionWithMultiOptionsAndOther(
             null
         }
 }
+
+///**
+// * A question with multiple options and an "Other" option allows the user to select multiple options
+// * from a list of options, as well as provide a custom answer if the "Other" option is selected.
+// * The answer is represented as a pair of a set of indices of the selected options in the [options]
+// * list and an optional string for the custom answer if the "Other" option is selected.
+// */
+//data class QuestionWithSingleOptionAndOther(
+//    override val id: String,
+//    override val text: String,
+//    val options: List<String>, // should not include "Other"
+//    override val answer: Pair<Int, String>? = null,
+//) : Question<Pair<Int, String>> {
+//    // NOTE: We allow the user to select no options, so we only check for invalid indices, not for null/empty
+////    override val errorMessage get() =
+////        if (answer?.any { it !in options.indices } == true) {
+////            Res.string.invalid_option_selected
+////        } else {
+////            null
+////        }
+//    override val errorMessage get() =
+//        when (answer) {
+//            null -> Res.string.no_option_selected
+////            !in options.indices -> Res.string.invalid_option_selected
+//            else -> null
+//        }
+//}
 
 /**
  * Convenience function to get a [SurveyElement] from a [Survey] by its [id]. Returns null if no

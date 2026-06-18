@@ -25,9 +25,10 @@ class SurveyRepository(
         questionId: String,
     ) = dao.answerForMultiQuestion(surveyResultId, questionId)
 
-    suspend fun saveResult(score: Int): Long =
+    suspend fun saveResult(score: Int, surveyType: SurveyType): Long =
         dao.insert(
             SurveyResultEntity(
+                surveyType = surveyType,
                 completedAtEpochMillis = currentTimeMillis(),
                 totalScore = score,
             ),

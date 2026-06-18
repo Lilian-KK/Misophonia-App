@@ -105,6 +105,15 @@ fun SurveyElement.Render(
                 onAnswer?.let { { onAnswer(this.copy(answer = it)) } },
             )
         }
+
+//        is QuestionWithSingleOptionAndOther -> {
+//            QuestionWithSingleOptionAndOtherElement(
+//                this,
+//                modifier,
+//                showError,
+//                onAnswer?.let { { onAnswer(this.copy(answer = it)) } },
+//                )
+//        }
     }
 }
 
@@ -371,3 +380,29 @@ private fun QuestionWithMultiOptionsAndOtherElementPreview() {
             ),
     ) { }
 }
+
+//@Composable
+//private fun QuestionWithSingleOptionAndOtherElement(
+//    question: QuestionWithSingleOptionAndOther,
+//    modifier: Modifier = Modifier,
+//    showError: Boolean = true,
+//    onAnswer: ((Pair<Int, String>) -> Unit)? = null,
+//) {
+//    val (selection, other) = question.answer ?: Pair(emptySet(), "")
+//    Column(
+//        verticalArrangement = Arrangement.spacedBy(4.dp),
+//        modifier = modifier.fillMaxWidth(),
+//    ) {
+//        QuestionText(question, showError = showError)
+//        Checkboxes(
+//            options = question.options,
+//            answers = selection,
+//            modifier = Modifier.fillMaxWidth(),
+//            onChange = onAnswer?.let { { onAnswer(it to other) } },
+//        )
+//        OtherBox(
+//            other,
+//            onChange = onAnswer?.let { { onAnswer(selection to it) } },
+//        )
+//    }
+//}

@@ -19,10 +19,6 @@
     <string name="answer_all">Please answer all questions before submitting</string>
     <string name="submit">Submit</string>
 
-    <string name="history">History</string>
-    <string name="no_history">No survey results yet.</string>
-    <string name="date">Date: %1$s</string>
-    <string name="score">Score: %1$d</string>
     <string name="loading">Loading...</string>
     <string name="survey_results_from">Survey results from %1$s</string>
 
@@ -32,6 +28,11 @@
     <string name="welcome_message">Welcome to Tranquilify</string>
     <string name="login">Log In</string>
     <string name="create_account">Create an Account</string>
+
+    <!--HubScreen-->
+    <string name="amisosr_survey">AMISOSR Survey</string>
+    <string name="duke_survey">Duke Misophonia Questionnaire</string>
+    <string name="trigger_log">Trigger Log Record</string>
 
     <!--BottomAppBar icons content descriptions-->
     <string name="home_button">The home button</string>
@@ -56,5 +57,13 @@
 
     <!--LogInScreen-->
     <string name="clear">Clear</string>
+
+    <!--SurveyHistoryScreen-->
+    <string name="history">History</string>
+    <string name="no_history">No survey results yet.</string>
+    <string name="date">Date: %1$s</string>
+    <string name="score">Score: %1$d</string>
+    <string name="survey_type">Survey: %1$s</string>
+
 
 </resources>
