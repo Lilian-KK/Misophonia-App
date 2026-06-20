@@ -64,6 +64,7 @@ import edu.moravian.csci215.misophoniaapp.server_data.ServerVM
 import edu.moravian.csci215.misophoniaapp.server_data.logIn
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyElement
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyRepository
+import edu.moravian.csci215.misophoniaapp.survey_data.SurveyType
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyVM
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -102,6 +103,7 @@ fun App(repository: SurveyRepository) {
             defaultRequest {
                 url {
                     protocol = URLProtocol.HTTP
+                    //nora note: this host is only for the android studio emulator!! change the ip for other devices
                     host = "10.0.2.2"
                     port = 8000
                 }
@@ -114,19 +116,19 @@ fun App(repository: SurveyRepository) {
 
     val currentScreen = navBackStackEntry?.destination?.route
     println(currentScreen)
-    // todo make this less redundant/more efficient, add ViewSurveyScreen
-    val screensWithBottomBar = listOf("edu.moravian.csci215.misophoniaapp.screens." + AppSettings.toString(), "edu.moravian.csci215.misophoniaapp.screens." + HeadphonesSettings.toString(), "edu.moravian.csci215.misophoniaapp.screens." + Hub.toString(), "edu.moravian.csci215.misophoniaapp.screens." + SurveyHistory.toString(), "edu.moravian.csci215.misophoniaapp.screens." + WifiNetworks.toString(), "edu.moravian.csci215.misophoniaapp.screens." + ViewSurvey.toString())
+    val screensWithBottomBar = listOf(AppSettings.toString(), HeadphonesSettings.toString(), Hub.toString(), SurveyHistory.toString(), WifiNetworks.toString())
     println(screensWithBottomBar)
+    val hasBottomBar = screensWithBottomBar.any { currentScreen?.contains(it) == true || currentScreen?.contains("ViewSurvey") == true}
 
     MaterialTheme {
         Scaffold(
             bottomBar = {
-                if (screensWithBottomBar.contains(currentScreen) || (currentScreen?.contains("ViewSurvey") == true)) {
+                if (hasBottomBar) {
                     BottomAppBar(
                         actions = {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center,
+                                horizontalArrangement = Arrangement.SpaceEvenly,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 IconButton({ navController.navigate(Hub) }) {
@@ -228,13 +230,14 @@ fun App(repository: SurveyRepository) {
                     }
                 }
                 composable<SurveyHistory> {
-                    SurveyHistoryScreen(repository) { surveyId: Long ->
-                        navController.navigate(ViewSurvey(surveyId))
+                    SurveyHistoryScreen(repository) { surveyId: Long, surveyType: SurveyType ->
+                        navController.navigate(ViewSurvey(surveyId, surveyType))
                     }
                 }
                 composable<ViewSurvey> { navBackStackEntry ->
                     val surveyId = navBackStackEntry.toRoute<ViewSurvey>().surveyId
-                    ViewSurveyScreen(surveyId, repository)
+                    val surveyType = navBackStackEntry.toRoute<ViewSurvey>().surveyType
+                    ViewSurveyScreen(surveyId, surveyType, repository)
                 }
                 composable<AppSettings> {
                     AppSettingsScreen()

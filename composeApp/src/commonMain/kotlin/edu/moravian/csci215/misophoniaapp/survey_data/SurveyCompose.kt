@@ -12,6 +12,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.ToggleButton
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import misophoniaapp.composeapp.generated.resources.Res
 import misophoniaapp.composeapp.generated.resources.other
 import org.jetbrains.compose.resources.stringResource
+import kotlin.math.roundToInt
 
 /**
  * Renders a list of [SurveyElement]s as a scrollable column. Each element is rendered using the
@@ -99,6 +101,15 @@ fun SurveyElement.Render(
 
         is QuestionWithMultiOptionsAndOther -> {
             QuestionWithMultiOptionsAndOtherElement(
+                this,
+                modifier,
+                showError,
+                onAnswer?.let { { onAnswer(this.copy(answer = it)) } },
+            )
+        }
+
+        is SliderQuestion -> {
+            SliderQuestionElement(
                 this,
                 modifier,
                 showError,
@@ -379,6 +390,31 @@ private fun QuestionWithMultiOptionsAndOtherElementPreview() {
                 answer = Pair(setOf(0, 2), "Yellow"),
             ),
     ) { }
+}
+
+@Composable
+private fun SliderQuestionElement(
+    question: SliderQuestion,
+    modifier: Modifier = Modifier,
+    showError: Boolean = true,
+    onAnswer: ((Int) -> Unit)? = null,
+) {
+    Column(modifier) {
+        QuestionText(question, showError = showError)
+        var sliderPosition by remember { mutableFloatStateOf(0f) }
+        val sliderMin = question.correspondingText.keys.minOrNull() ?: 0f
+        val sliderMax = question.correspondingText.keys.maxOrNull() ?: 0f
+        Slider(
+            value = sliderPosition,
+            onValueChange =  { value ->
+                sliderPosition = value
+                onAnswer?.invoke(value.toInt())
+            },
+            steps = question.correspondingText.size,
+            valueRange = sliderMin.toFloat()..sliderMax.toFloat()
+        )
+        Text(question.correspondingText[sliderPosition.toInt()] ?: "")
+    }
 }
 
 //@Composable

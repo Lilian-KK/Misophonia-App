@@ -15,6 +15,8 @@ class SurveyRepository(
 
     fun multiQuestionResults(surveyResultId: Long) = dao.answersForMultiQuestions(surveyResultId)
 
+    fun sliderQuestionResults(surveyResultId: Long) = dao.answersForSliderQuestions(surveyResultId)
+
     fun singleQuestionResult(
         surveyResultId: Long,
         questionId: String,
@@ -59,6 +61,19 @@ class SurveyRepository(
                 questionId = questionId,
                 answers = answers,
                 other = other,
+            ),
+        )
+
+    suspend fun saveSliderQuestion(
+        surveyId: Long,
+        questionId: String,
+        answer: Int,
+    ): Long =
+        dao.insert(
+            SurveyQuestionSliderAnswerResultEntity(
+                surveyResultId = surveyId,
+                questionId = questionId,
+                answer = answer,
             ),
         )
 }

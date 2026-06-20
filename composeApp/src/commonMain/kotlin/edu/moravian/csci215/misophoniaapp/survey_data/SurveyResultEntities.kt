@@ -30,3 +30,12 @@ data class SurveyQuestionMultiAnswerResultEntity(
     val answers: Set<Int>,
     val other: String? = null,
 )
+
+@Entity(tableName = "survey_question_slider_answer_results")
+data class SurveyQuestionSliderAnswerResultEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    val surveyResultId: Long,
+    val questionId: String,
+    val answer: Int,
+)

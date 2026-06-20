@@ -45,6 +45,14 @@ suspend fun SurveyQuestions.save(surveyType: SurveyType, repository: SurveyRepos
                     other = question.answer?.second,
                 )
             }
+
+            is SliderQuestion -> {
+                repository.saveSliderQuestion(
+                    surveyId = surveyId,
+                    questionId = question.id,
+                    answer = question.answer ?: -1,
+                )
+            }
         }
     }
 }
@@ -59,6 +67,7 @@ suspend fun Survey.load(
     // Load the answers for all questions
     val singleResults = repository.singleQuestionResults(surveyId).first()
     val multiResults = repository.multiQuestionResults(surveyId).first()
+    val sliderResults = repository.sliderQuestionResults(surveyId).first()
     // Map the results back to the questions
     return this.map { question ->
         when (question) {
@@ -75,6 +84,11 @@ suspend fun Survey.load(
             is QuestionWithMultiOptionsAndOther -> {
                 val answer = multiResults.firstOrNull { it.questionId == question.id }
                 if (answer == null) question else question.copy(answer = answer.answers to (answer.other ?: ""))
+            }
+
+            is SliderQuestion -> {
+                val answer = sliderResults.firstOrNull { it.questionId == question.id }?.answer
+                if (answer == null) question else question.copy(answer = answer)
             }
 
             else -> {

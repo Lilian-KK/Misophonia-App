@@ -143,6 +143,26 @@ data class QuestionWithMultiOptionsAndOther(
         }
 }
 
+/**
+ * A question that presents the user with a slider representing a given spectrum.
+ * Each tick on the spectrum is an integer, one of which will be the answer.
+ * The options are a list of maps between the Int (currently selected answer)
+ * and an associated String (the text that may appear if the Int is selected).
+ */
+data class SliderQuestion(
+    override val id: String,
+    override val text: String,
+    val correspondingText: Map<Int, String>,
+    override val answer: Int? = null,
+): Question<Int> {
+//    override val errorMessage get() =
+//        when (answer) {
+//            null -> Res.string.no_option_selected
+//            !in options.indices -> Res.string.invalid_option_selected
+//            else -> null
+//        }
+}
+
 ///**
 // * A question with multiple options and an "Other" option allows the user to select multiple options
 // * from a list of options, as well as provide a custom answer if the "Other" option is selected.
@@ -205,3 +225,13 @@ val SurveyQuestions.score
 val SurveyQuestions.hasErrors
     @JvmName("getSurveyQuestionsErrors")
     get() = any { it.errorMessage != null }
+
+fun SurveyType.toElementsList(): List<SurveyElement> {
+    val surveyType = when (this) {
+        SurveyType.AMISOSR_SURVEY -> AMISOS_R_SURVEY
+        SurveyType.DUKE_SURVEY -> DUKE_SURVEY
+        SurveyType.TRIGGER_LOG_SURVEY -> TRIGGER_LOG_SURVEY
+    }
+    println(surveyType)
+    return surveyType
+}

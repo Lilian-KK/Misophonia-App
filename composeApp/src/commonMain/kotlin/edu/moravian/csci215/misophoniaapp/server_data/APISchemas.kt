@@ -76,6 +76,9 @@ suspend fun logIn(
     phoneNumber: String,
     password: String
 ) {
+    println("running login method in APISchemas")
+    println(phoneNumber)
+    println(password)
     return client.post("login") {
         contentType(ContentType.Application.Json)
 

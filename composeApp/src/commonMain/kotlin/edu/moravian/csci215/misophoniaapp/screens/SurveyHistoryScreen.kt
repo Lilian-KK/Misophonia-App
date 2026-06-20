@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import edu.moravian.csci215.misophoniaapp.formatEpochMillis
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyRepository
+import edu.moravian.csci215.misophoniaapp.survey_data.SurveyType
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
 import misophoniaapp.composeapp.generated.resources.date
@@ -34,7 +35,7 @@ data object SurveyHistory
 @Composable
 fun SurveyHistoryScreen(
     repository: SurveyRepository,
-    onViewPastSurvey: (Long) -> Unit
+    onViewPastSurvey: (Long, SurveyType) -> Unit
 ) {
     val entriesState = repository.allResults.collectAsState(emptyList())
     val entries = entriesState.value
@@ -55,7 +56,7 @@ fun SurveyHistoryScreen(
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(entries, key = { it.id }) { result ->
-                Card(modifier = Modifier.fillMaxWidth().clickable { onViewPastSurvey(result.id) }) {
+                Card(modifier = Modifier.fillMaxWidth().clickable { onViewPastSurvey(result.id, result.surveyType) }) {
                     Column(modifier = Modifier.padding(12.dp)) {
                         Text(stringResource(Res.string.survey_type, result.surveyType))
                         Text(stringResource(Res.string.date, formatEpochMillis(result.completedAtEpochMillis)))

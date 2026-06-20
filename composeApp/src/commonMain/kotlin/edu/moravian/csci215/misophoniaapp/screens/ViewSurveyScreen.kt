@@ -23,8 +23,11 @@ import edu.moravian.csci215.misophoniaapp.formatEpochMillis
 import edu.moravian.csci215.misophoniaapp.survey_data.Render
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyRepository
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyResultEntity
+import edu.moravian.csci215.misophoniaapp.survey_data.SurveyType
 import edu.moravian.csci215.misophoniaapp.survey_data.load
+import edu.moravian.csci215.misophoniaapp.survey_data.toElementsList
 import edu.moravian.csci215.misophoniaapp.surveys.AMISOS_R_SURVEY
+import edu.moravian.csci215.misophoniaapp.surveys.TRIGGER_LOG_SURVEY
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
@@ -39,6 +42,7 @@ import org.jetbrains.compose.resources.stringResource
 @Serializable
 data class ViewSurvey(
     val surveyId: Long,
+    val surveyType: SurveyType
 )
 
 /**
@@ -48,11 +52,12 @@ data class ViewSurvey(
 @Composable
 fun ViewSurveyScreen(
     surveyId: Long,
+    surveyType: SurveyType,
     repository: SurveyRepository,
 ) {
     var loading by remember { mutableStateOf(true) }
     var result by remember { mutableStateOf<SurveyResultEntity?>(null) }
-    var survey by remember { mutableStateOf(AMISOS_R_SURVEY) }
+    var survey by remember { mutableStateOf(surveyType.toElementsList()) }
     LaunchedEffect(surveyId) {
         result = repository.getResult(surveyId).first()
         survey = survey.load(surveyId, repository)
