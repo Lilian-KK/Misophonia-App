@@ -60,7 +60,7 @@ import edu.moravian.csci215.misophoniaapp.screens.ViewSurvey
 import edu.moravian.csci215.misophoniaapp.screens.ViewSurveyScreen
 import edu.moravian.csci215.misophoniaapp.screens.WifiNetworks
 import edu.moravian.csci215.misophoniaapp.screens.WifiNetworksScreen
-import edu.moravian.csci215.misophoniaapp.server_data.ServerVM
+import edu.moravian.csci215.misophoniaapp.server_data.createAccount
 import edu.moravian.csci215.misophoniaapp.server_data.logIn
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyElement
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyRepository
@@ -97,6 +97,7 @@ fun App(repository: SurveyRepository) {
     val coroutineScope = rememberCoroutineScope()
     val isSetup = false
     val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val httpClient = remember {
         HttpClient(CIO) {
@@ -122,6 +123,7 @@ fun App(repository: SurveyRepository) {
 
     MaterialTheme {
         Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             bottomBar = {
                 if (hasBottomBar) {
                     BottomAppBar(
@@ -189,15 +191,17 @@ fun App(repository: SurveyRepository) {
                     )
                 }
                 composable<LogIn> {
-                    //val vm: ServerVM = viewModel()
                     LoginScreen(
                         onLogin = { phoneNumber: String, password: String ->
-                            coroutineScope.launch {
-                                logIn(httpClient, phoneNumber, password)
-                            }
+                            logIn(httpClient, phoneNumber, password)
                         },
                         toHub = { navController.navigate(Hub) },
                         onForgotPassword = { navController.navigate(ForgotPassword) },
+                        showSnackbar = {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(it)
+                            }
+                        },
                     )
                 }
                 composable<ForgotPassword> {
@@ -207,10 +211,12 @@ fun App(repository: SurveyRepository) {
                 }
                 composable<CreateAccount> {
                     CreateAccountScreen(
-                        onCreateAccount = { phoneNumber, name, password ->
-                            // Handle account creation logic here
-                            navController.navigate(Hub)
+                        onCreateAccount = { phoneNumber: String, name: String, password: String ->
+                            coroutineScope.launch {
+                                createAccount(httpClient, phoneNumber, name, password)
+                            }
                         },
+                        toHub = { navController.navigate(Hub) }
                     )
                 }
                 composable<Hub> {

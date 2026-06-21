@@ -57,6 +57,7 @@
 
     <!--LogInScreen-->
     <string name="clear">Clear</string>
+    <string name="incorrect_credentials">Incorrect phone number or password.</string>
 
     <!--SurveyHistoryScreen-->
     <string name="history">History</string>

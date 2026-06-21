@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,11 +45,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.ktor.client.HttpClient
+import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
 import misophoniaapp.composeapp.generated.resources.cancel_symbol
 import misophoniaapp.composeapp.generated.resources.clear
 import misophoniaapp.composeapp.generated.resources.forgot_password
+import misophoniaapp.composeapp.generated.resources.incorrect_credentials
 import misophoniaapp.composeapp.generated.resources.login
 import misophoniaapp.composeapp.generated.resources.password
 import misophoniaapp.composeapp.generated.resources.phone_number
@@ -64,12 +69,14 @@ data object LogIn
 
 @Composable
 fun LoginScreen(
-    onLogin: (String, String) -> Unit,
+    onLogin: suspend (String, String) -> HttpStatusCode,
     toHub: () -> Unit,
     onForgotPassword: () -> Unit,
+    showSnackbar: (String) -> Unit
 ) {
     val (phoneNumber, setPhoneNumber) = remember { mutableStateOf("") }
     val (password, setPassword) = remember { mutableStateOf("")}
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier =
@@ -109,7 +116,6 @@ fun LoginScreen(
                 password = password,
                 setPassword = setPassword
             )
-//            LoginFields(onForgotPassword = onForgotPassword)
         }
 
         Box(
@@ -118,9 +124,17 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 16.dp),
         ) {
+            val incorrectCredentialsMessage = stringResource(Res.string.incorrect_credentials)
             Button(
-                onClick = { onLogin(phoneNumber, password)
-                    toHub() },
+                onClick = {
+                    coroutineScope.launch {
+                        val loginStatus = onLogin(phoneNumber, password)
+                    if (loginStatus == HttpStatusCode.OK) {
+                        toHub()
+                    } else {
+                        showSnackbar(incorrectCredentialsMessage)
+                    }
+                } },
                 modifier =
                     Modifier
                         .fillMaxWidth()

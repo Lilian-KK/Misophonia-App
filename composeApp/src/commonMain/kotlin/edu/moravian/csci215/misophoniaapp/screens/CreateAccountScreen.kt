@@ -58,7 +58,8 @@ data object CreateAccount
 
 @Composable
 fun CreateAccountScreen(
-    onCreateAccount: (phoneNumber: String, name: String, password: String) -> Unit = { _, _, _ -> },
+    onCreateAccount: (String, String, String) -> Unit,
+    toHub: () -> Unit
 ) {
     var phoneNumber by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
@@ -119,6 +120,7 @@ fun CreateAccountScreen(
         Button(
             onClick = {
                 onCreateAccount(phoneNumber, name, password)
+                toHub()
             },
             modifier =
                 Modifier
