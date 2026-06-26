@@ -1,5 +1,6 @@
 package edu.moravian.csci215.misophoniaapp.survey_data
 
+import androidx.room.AutoMigration
 import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -14,10 +15,11 @@ import kotlinx.coroutines.IO
         SurveyResultEntity::class,
         SurveyQuestionSingleAnswerResultEntity::class,
         SurveyQuestionMultiAnswerResultEntity::class,
-        SurveyQuestionSliderAnswerResultEntity::class
+        SurveyQuestionSliderAnswerResultEntity::class,
+        SurveyQuestionThisOrThatResultEntity::class
     ],
-    version = 3,
-    exportSchema = false,
+    version = 4,
+    exportSchema = true
 )
 @ConstructedBy(SurveyDatabaseConstructor::class)
 @TypeConverters(Converters::class)

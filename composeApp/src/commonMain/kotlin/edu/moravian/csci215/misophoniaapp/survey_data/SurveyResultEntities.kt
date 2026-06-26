@@ -39,3 +39,12 @@ data class SurveyQuestionSliderAnswerResultEntity(
     val questionId: String,
     val answer: Int,
 )
+
+@Entity(tableName = "survey_question_thisorthat_answer_results")
+data class SurveyQuestionThisOrThatResultEntity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    val surveyResultId: Long,
+    val questionId: String,
+    val answer: Int,
+)

@@ -4,6 +4,7 @@ import edu.moravian.csci215.misophoniaapp.survey_data.Instruction
 import edu.moravian.csci215.misophoniaapp.survey_data.QuestionWithMultiOptions
 import edu.moravian.csci215.misophoniaapp.survey_data.QuestionWithSingleOption
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyElement
+import edu.moravian.csci215.misophoniaapp.survey_data.ThisOrThatQuestion
 
 private val SCALE_OPTIONS = listOf("0", "1", "2", "3", "4")
 private val YES_NO_OPTIONS = listOf("Yes", "No")
@@ -23,80 +24,80 @@ val DUKE_SURVEY: List<SurveyElement> =
             "Please indicate whether the following sounds and/or sights bother you much more intensely than they do most " +
                 "other people",
         ),
-        QuestionWithSingleOption(
+        ThisOrThatQuestion(
             "bother1",
             "1. People making mouth sounds while eating or drinking (e.g., chewing, crunching, " +
-                "slurping).",
+                    "slurping).",
             YES_NO_OPTIONS,
         ),
-        QuestionWithSingleOption(
+        ThisOrThatQuestion(
             "bother2",
             "2. People making nasal/throat sounds (e.g., sniffing, sneezing, nose‐whistling, coughing, " +
                 "throat‐clearing).",
             YES_NO_OPTIONS,
         ),
-        QuestionWithSingleOption(
+        ThisOrThatQuestion(
             "bother3",
             "3. People making mouth sounds when not eating (e.g., making the \"tsk\" sound, heavy " +
                 "breathing, snoring, whistling).",
             YES_NO_OPTIONS,
         ),
-        QuestionWithSingleOption(
+        ThisOrThatQuestion(
             "bother4",
             "4. People making repetitive sounds (e.g., typing, tapping nails on table, pen clicking, " +
                 "writing, construction work, using machinery).",
             YES_NO_OPTIONS,
         ),
-        QuestionWithSingleOption(
+        ThisOrThatQuestion(
             "bother5",
             "5. Rustling or tearing objects (e.g., paper, plastic).",
             YES_NO_OPTIONS,
         ),
-        QuestionWithSingleOption(
+        ThisOrThatQuestion(
             "bother6",
             "6. Speech sounds (e.g., \"p\" sounds, hissing \"s\" sounds, someone speaking with a lisp, " +
                 "high‐pitched voices).",
             YES_NO_OPTIONS,
         ),
-        QuestionWithSingleOption(
+        ThisOrThatQuestion(
             "bother7",
             "7. Body or joint sounds (e.g., snapping fingers, cracking joints, jaw clicking).",
             YES_NO_OPTIONS,
         ),
-        QuestionWithSingleOption(
+        ThisOrThatQuestion(
             "bother8",
             "8. Rubbing sounds (e.g., hands on pants, hands against one another, Styrofoam rubbing " +
                 "together).",
             YES_NO_OPTIONS,
         ),
-        QuestionWithSingleOption(
+        ThisOrThatQuestion(
             "bother9",
             "9. Stomping or loud walking (e.g., heels clicking, flip flops, etc.).",
             YES_NO_OPTIONS,
         ),
-        QuestionWithSingleOption(
+        ThisOrThatQuestion(
             "bother10",
             "10. Muffled sounds (e.g., voices separated by a wall, TV /music in another room).",
             YES_NO_OPTIONS,
         ),
-        QuestionWithSingleOption(
+        ThisOrThatQuestion(
             "bother11",
             "11. People talking in the background (e.g., phone calls in public, many people talking at " +
                 "once).",
             YES_NO_OPTIONS,
         ),
-        QuestionWithSingleOption(
+        ThisOrThatQuestion(
             "bother12",
             "12. Repetitive or continuous sounds not made by a person (e.g., clock ticking, air " +
                 "conditioner humming, water running).",
             YES_NO_OPTIONS,
         ),
-        QuestionWithSingleOption(
+        ThisOrThatQuestion(
             "bother13",
             "13. Animals making repetitive sounds (e.g., licking, chirping, barking, eating, drinking).",
             YES_NO_OPTIONS,
         ),
-        QuestionWithSingleOption(
+        ThisOrThatQuestion(
             "bother14",
             "14. Seeing someone making or about to make a sound that bothers you, even if you can't " +
                 "hear it (e.g., seeing someone reach into a bag of chips, seeing someone eating on TV " +
@@ -104,12 +105,12 @@ val DUKE_SURVEY: List<SurveyElement> =
             YES_NO_OPTIONS,
         ),
         // fix this one
-        QuestionWithSingleOption(
+        ThisOrThatQuestion(
             "bother15",
             "15. NOTE: FIX THIS ONE. it has an other box AND yes/no. Other (please describe):",
             YES_NO_OPTIONS,
         ),
-        QuestionWithSingleOption(
+        ThisOrThatQuestion(
             "bother16",
             "16. There are no specific sounds that bother me much more than they do other people",
             YES_NO_OPTIONS,

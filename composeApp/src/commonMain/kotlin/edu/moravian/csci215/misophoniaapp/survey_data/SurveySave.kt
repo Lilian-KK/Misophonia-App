@@ -53,6 +53,14 @@ suspend fun SurveyQuestions.save(surveyType: SurveyType, repository: SurveyRepos
                     answer = question.answer ?: -1,
                 )
             }
+
+            is ThisOrThatQuestion -> {
+                repository.saveThisOrThatQuestion(
+                        surveyId = surveyId,
+                        questionId = question.id,
+                        answer = question.answer ?: -1
+                )
+            }
         }
     }
 }
@@ -68,6 +76,8 @@ suspend fun Survey.load(
     val singleResults = repository.singleQuestionResults(surveyId).first()
     val multiResults = repository.multiQuestionResults(surveyId).first()
     val sliderResults = repository.sliderQuestionResults(surveyId).first()
+    val thisorthatResults = repository.thisorthatQuestionResults(surveyId).first()
+
     // Map the results back to the questions
     return this.map { question ->
         when (question) {
@@ -88,6 +98,11 @@ suspend fun Survey.load(
 
             is SliderQuestion -> {
                 val answer = sliderResults.firstOrNull { it.questionId == question.id }?.answer
+                if (answer == null) question else question.copy(answer = answer)
+            }
+
+            is ThisOrThatQuestion -> {
+                val answer = thisorthatResults.firstOrNull { it.questionId == question.id }?.answer
                 if (answer == null) question else question.copy(answer = answer)
             }
 

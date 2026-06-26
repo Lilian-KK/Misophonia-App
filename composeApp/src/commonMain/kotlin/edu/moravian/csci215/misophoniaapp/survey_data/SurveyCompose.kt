@@ -5,27 +5,36 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonShapes
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import io.ktor.client.request.invoke
 import misophoniaapp.composeapp.generated.resources.Res
+import misophoniaapp.composeapp.generated.resources.checkmark
 import misophoniaapp.composeapp.generated.resources.other
+import misophoniaapp.composeapp.generated.resources.uncheckmark
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
@@ -110,6 +119,15 @@ fun SurveyElement.Render(
 
         is SliderQuestion -> {
             SliderQuestionElement(
+                this,
+                modifier,
+                showError,
+                onAnswer?.let { { onAnswer(this.copy(answer = it)) } },
+            )
+        }
+
+        is ThisOrThatQuestion -> {
+            ThisOrThatQuestionElement(
                 this,
                 modifier,
                 showError,
@@ -302,20 +320,6 @@ private fun QuestionWithSingleOptionElement(
     }
 }
 
-@Preview
-@Composable
-private fun QuestionWithSingleOptionElementPreview() {
-    QuestionWithSingleOptionElement(
-        question =
-            QuestionWithSingleOption(
-                id = "q1",
-                text = "What is your favorite color?",
-                options = listOf("Red", "Green", "Blue"),
-                answer = 2,
-            ),
-    ) { }
-}
-
 @Composable
 private fun QuestionWithMultiOptionsElement(
     question: QuestionWithMultiOptions,
@@ -336,20 +340,6 @@ private fun QuestionWithMultiOptionsElement(
             onChange = onAnswer,
         )
     }
-}
-
-@Preview
-@Composable
-private fun QuestionWithMultiOptionsElementPreview() {
-    QuestionWithMultiOptionsElement(
-        question =
-            QuestionWithMultiOptions(
-                id = "q1",
-                text = "Which colors do you like?",
-                options = listOf("Red", "Green", "Blue"),
-                answer = setOf(0, 2),
-            ),
-    ) { }
 }
 
 @Composable
@@ -378,19 +368,6 @@ private fun QuestionWithMultiOptionsAndOtherElement(
     }
 }
 
-@Preview
-@Composable
-private fun QuestionWithMultiOptionsAndOtherElementPreview() {
-    QuestionWithMultiOptionsAndOtherElement(
-        question =
-            QuestionWithMultiOptionsAndOther(
-                id = "q1",
-                text = "Which colors do you like?",
-                options = listOf("Red", "Green", "Blue"),
-                answer = Pair(setOf(0, 2), "Yellow"),
-            ),
-    ) { }
-}
 
 @Composable
 private fun SliderQuestionElement(
@@ -410,12 +387,51 @@ private fun SliderQuestionElement(
                 sliderPosition = value
                 onAnswer?.invoke(value.toInt())
             },
-            steps = question.correspondingText.size,
+            steps = (question.correspondingText.size - 2),
             valueRange = sliderMin.toFloat()..sliderMax.toFloat()
         )
-        Text(question.correspondingText[sliderPosition.toInt()] ?: "")
+        Text(question.correspondingText[if (sliderPosition > 6.0 && sliderPosition < 8.0) 7 else sliderPosition.toInt()] ?: "")
     }
 }
+
+@Composable
+private fun ThisOrThatQuestionElement(
+    question: ThisOrThatQuestion,
+    modifier: Modifier = Modifier,
+    showError: Boolean = true,
+    onAnswer: ((Int) -> Unit)? = null,
+) {
+    println("These are the options: " + question.options)
+    Column(modifier) {
+        Row(
+            horizontalArrangement = Arrangement.End
+        ) {
+            QuestionText(question, showError = showError)
+            RadioButtonGroup(
+                options = question.options,
+                answer = question.answer,
+                modifier = modifier,
+                onChange = onAnswer
+            )
+//            Switch(
+//                checked = isChecked,
+//                onCheckedChange =  { onAnswer?.invoke(isChecked); isChecked = !isChecked },
+//                enabled = true,
+//                colors = SwitchDefaults.colors(
+//                    checkedTrackColor = Color.Green, //Color(0x1FAD2E),
+//                    uncheckedTrackColor = Color.Red //Color(0xAD1F1F),
+//                ),
+//                thumbContent = {
+//                    Icon(
+//                        painter = if (isChecked) painterResource(Res.drawable.checkmark) else painterResource(Res.drawable.uncheckmark),
+//                        contentDescription = if (isChecked) stringResource(Res.string.checkmark) else stringResource(Res.string.uncheckmark),
+//                        tint = if (isChecked) Color(0x1FAD2E) else Color(0xAD1F1F)
+//                    )
+//                }
+        }
+    }
+}
+
 
 //@Composable
 //private fun QuestionWithSingleOptionAndOtherElement(

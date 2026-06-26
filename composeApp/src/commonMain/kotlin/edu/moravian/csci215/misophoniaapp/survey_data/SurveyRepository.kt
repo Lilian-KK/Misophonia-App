@@ -17,6 +17,9 @@ class SurveyRepository(
 
     fun sliderQuestionResults(surveyResultId: Long) = dao.answersForSliderQuestions(surveyResultId)
 
+    fun thisorthatQuestionResults(surveyResultId: Long) = dao.answersForThisOrThatQuestions(surveyResultId)
+
+
     fun singleQuestionResult(
         surveyResultId: Long,
         questionId: String,
@@ -71,6 +74,19 @@ class SurveyRepository(
     ): Long =
         dao.insert(
             SurveyQuestionSliderAnswerResultEntity(
+                surveyResultId = surveyId,
+                questionId = questionId,
+                answer = answer,
+            ),
+        )
+
+    suspend fun saveThisOrThatQuestion(
+        surveyId: Long,
+        questionId: String,
+        answer: Int,
+    ): Long =
+        dao.insert(
+            SurveyQuestionThisOrThatResultEntity(
                 surveyResultId = surveyId,
                 questionId = questionId,
                 answer = answer,

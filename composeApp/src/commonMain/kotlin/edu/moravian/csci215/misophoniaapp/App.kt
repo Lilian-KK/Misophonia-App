@@ -202,11 +202,13 @@ fun App(repository: SurveyRepository) {
                                 snackbarHostState.showSnackbar(it)
                             }
                         },
+                        goBack =  { navController.navigateUp() }
                     )
                 }
                 composable<ForgotPassword> {
                     ForgotPasswordScreen(
                         onContinue = { navController.navigate(Hub) },
+                        goBack =  { navController.navigateUp() }
                     )
                 }
                 composable<CreateAccount> {
@@ -216,7 +218,8 @@ fun App(repository: SurveyRepository) {
                                 createAccount(httpClient, phoneNumber, name, password)
                             }
                         },
-                        toHub = { navController.navigate(Hub) }
+                        toHub = { navController.navigate(Hub) },
+                        goBack = { navController.navigateUp() }
                     )
                 }
                 composable<Hub> {

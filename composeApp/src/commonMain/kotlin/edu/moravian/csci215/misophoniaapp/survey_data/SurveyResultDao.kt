@@ -20,6 +20,9 @@ interface SurveyResultDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(result: SurveyQuestionSliderAnswerResultEntity): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(result: SurveyQuestionThisOrThatResultEntity): Long
+
     @Query("SELECT * FROM survey_results ORDER BY completedAtEpochMillis DESC LIMIT 1")
     fun observeLatest(): Flow<SurveyResultEntity?>
 
@@ -47,6 +50,12 @@ interface SurveyResultDao {
         questionId: String,
     ): Flow<SurveyQuestionSliderAnswerResultEntity?>
 
+    @Query("SELECT * FROM survey_question_thisorthat_answer_results WHERE surveyResultId = :surveyResultId AND questionId = :questionId")
+    fun answerForThisOrThatQuestion(
+        surveyResultId: Long,
+        questionId: String,
+    ): Flow<SurveyQuestionThisOrThatResultEntity?>
+
     @Query("SELECT * FROM survey_question_single_answer_results WHERE surveyResultId = :surveyResultId")
     fun answersForSingleQuestions(surveyResultId: Long): Flow<List<SurveyQuestionSingleAnswerResultEntity>>
 
@@ -55,4 +64,8 @@ interface SurveyResultDao {
 
     @Query("SELECT * FROM survey_question_slider_answer_results WHERE surveyResultId = :surveyResultId")
     fun answersForSliderQuestions(surveyResultId: Long): Flow<List<SurveyQuestionSliderAnswerResultEntity>>
+
+    @Query("SELECT * FROM survey_question_thisorthat_answer_results WHERE surveyResultId = :surveyResultId")
+    fun answersForThisOrThatQuestions(surveyResultId: Long): Flow<List<SurveyQuestionThisOrThatResultEntity>>
+
 }

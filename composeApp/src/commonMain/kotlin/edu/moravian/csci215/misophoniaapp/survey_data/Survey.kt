@@ -163,6 +163,29 @@ data class SliderQuestion(
 //        }
 }
 
+
+/**
+ * A question that presents the user with a question with a toggle
+ * button beside it. To check the toggle is a Boolean true, while to
+ * leave it unchecked is a Boolean false. In the survey in which it is
+ * used, true is 'yes' and false is 'no'
+ * */
+data class ThisOrThatQuestion(
+    override val id: String,
+    override val text: String,
+    val options: List<String>,
+    //val scoring: Map<Int, Int> = emptyMap(), // maps option index to score
+    override val answer: Int? = null,
+): Question<Int> {
+    override val errorMessage get() =
+        when (answer) {
+            null -> Res.string.no_option_selected
+            !in options.indices -> Res.string.invalid_option_selected
+            else -> null
+        }
+    //override val score get() = answer?.let { scoring[it] } ?: 0
+}
+
 ///**
 // * A question with multiple options and an "Other" option allows the user to select multiple options
 // * from a list of options, as well as provide a custom answer if the "Other" option is selected.

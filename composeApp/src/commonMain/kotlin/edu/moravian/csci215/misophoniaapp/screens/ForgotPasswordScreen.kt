@@ -22,8 +22,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,21 +44,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
+import misophoniaapp.composeapp.generated.resources.back_arrow
+import misophoniaapp.composeapp.generated.resources.clear
 import misophoniaapp.composeapp.generated.resources.continue_
 import misophoniaapp.composeapp.generated.resources.didnt_get_code
 import misophoniaapp.composeapp.generated.resources.enter_code
 import misophoniaapp.composeapp.generated.resources.forgot_password
+import misophoniaapp.composeapp.generated.resources.go_back
 import misophoniaapp.composeapp.generated.resources.phone_number
 import misophoniaapp.composeapp.generated.resources.send_another_code
 import misophoniaapp.composeapp.generated.resources.send_code
 import misophoniaapp.composeapp.generated.resources.verify_for_pw_creation
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Serializable
 data object ForgotPassword
 
 @Composable
-fun ForgotPasswordScreen(onContinue: () -> Unit = {}) {
+fun ForgotPasswordScreen(
+    onContinue: () -> Unit = {},
+    goBack: () -> Unit
+) {
     var phoneNumber by remember { mutableStateOf("") }
     var codeSent by remember { mutableStateOf(false) }
     var code by remember { mutableStateOf(listOf("", "", "", "", "", "")) }
@@ -112,7 +117,7 @@ fun ForgotPasswordScreen(onContinue: () -> Unit = {}) {
                 value = phoneNumber,
                 onValueChange = { phoneNumber = it },
                 label = stringResource(Res.string.phone_number),
-                keyboardType = KeyboardType.Phone,
+                keyboardType = KeyboardType.Phone
             )
         }
 
@@ -253,6 +258,14 @@ fun ForgotPasswordScreen(onContinue: () -> Unit = {}) {
             }
         }
     }
+    IconButton(onClick = goBack, modifier = Modifier.size(48.dp)) {
+        Icon(
+            painter = painterResource(Res.drawable.back_arrow),
+            contentDescription = stringResource(Res.string.go_back),
+            modifier = Modifier.size(24.dp),
+            tint = Color.DarkGray
+        )
+    }
 }
 
 @Composable
@@ -303,8 +316,3 @@ private fun CodeChip(
     }
 }
 
-@Preview
-@Composable
-private fun ForgotPasswordScreenPreview() {
-    ForgotPasswordScreen()
-}

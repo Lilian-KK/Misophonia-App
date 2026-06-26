@@ -21,7 +21,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -33,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.PathNode
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -41,22 +42,26 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.ktor.client.HttpClient
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
+import misophoniaapp.composeapp.generated.resources.back_arrow
 import misophoniaapp.composeapp.generated.resources.cancel_symbol
 import misophoniaapp.composeapp.generated.resources.clear
+import misophoniaapp.composeapp.generated.resources.closed_eye
 import misophoniaapp.composeapp.generated.resources.forgot_password
+import misophoniaapp.composeapp.generated.resources.go_back
+import misophoniaapp.composeapp.generated.resources.hide_password
+import misophoniaapp.composeapp.generated.resources.history
 import misophoniaapp.composeapp.generated.resources.incorrect_credentials
 import misophoniaapp.composeapp.generated.resources.login
+import misophoniaapp.composeapp.generated.resources.open_eye
 import misophoniaapp.composeapp.generated.resources.password
 import misophoniaapp.composeapp.generated.resources.phone_number
+import misophoniaapp.composeapp.generated.resources.show_password
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -72,7 +77,8 @@ fun LoginScreen(
     onLogin: suspend (String, String) -> HttpStatusCode,
     toHub: () -> Unit,
     onForgotPassword: () -> Unit,
-    showSnackbar: (String) -> Unit
+    showSnackbar: (String) -> Unit,
+    goBack: () -> Unit
 ) {
     val (phoneNumber, setPhoneNumber) = remember { mutableStateOf("") }
     val (password, setPassword) = remember { mutableStateOf("")}
@@ -114,7 +120,8 @@ fun LoginScreen(
                 phoneNumber = phoneNumber,
                 setPhoneNumber = setPhoneNumber,
                 password = password,
-                setPassword = setPassword
+                setPassword = setPassword,
+                goBack = goBack
             )
         }
 
@@ -161,15 +168,15 @@ private fun LoginFields(
     phoneNumber: String,
     setPhoneNumber: (String) -> Unit,
     password: String,
-    setPassword: (String) -> Unit
+    setPassword: (String) -> Unit,
+    goBack: () -> Unit
 ) {
-
     Column(verticalArrangement = Arrangement.spacedBy(32.dp)) {
         FilledTextField(
             value = phoneNumber,
             onValueChange = setPhoneNumber,
             label = stringResource(Res.string.phone_number),
-            keyboardType = KeyboardType.Phone,
+            keyboardType = KeyboardType.Phone
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -178,13 +185,21 @@ private fun LoginFields(
                 onValueChange = setPassword,
                 label = stringResource(Res.string.password),
                 keyboardType = KeyboardType.Password,
-                isPassword = true,
+                isPassword = true
             )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
+                IconButton(onClick = goBack, modifier = Modifier.size(48.dp)) {
+                    Icon(
+                        painter = painterResource(Res.drawable.back_arrow),
+                        modifier = Modifier.size(24.dp),
+                        contentDescription = stringResource(Res.string.go_back),
+                        tint = Color.DarkGray
+                    )
+                }
                 TextButton(
                     onClick = onForgotPassword,
                     contentPadding =
@@ -212,8 +227,10 @@ fun FilledTextField(
     onValueChange: (String) -> Unit,
     label: String,
     keyboardType: KeyboardType = KeyboardType.Text,
-    isPassword: Boolean = false,
+    isPassword: Boolean = false
 ) {
+    var isCensored by remember { mutableStateOf(true) }
+
     Column {
         Box(
             modifier =
@@ -247,7 +264,7 @@ fun FilledTextField(
                                 fontWeight = FontWeight.Normal,
                                 color = Color(0xFF1D1B20),
                             ),
-                        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+                        visualTransformation = if (isPassword && isCensored) PasswordVisualTransformation() else VisualTransformation.None,
                         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
                         modifier =
                             Modifier
@@ -255,20 +272,27 @@ fun FilledTextField(
                                 .height(28.dp),
                     )
                 }
+                if (isPassword) {
+                    IconButton(
+                        onClick = { isCensored = !isCensored },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            painter = if (isCensored) painterResource(Res.drawable.open_eye) else painterResource(Res.drawable.closed_eye),
+                            contentDescription = if (isPassword) stringResource(Res.string.show_password) else stringResource(Res.string.hide_password),
+                            modifier = Modifier.size(20.dp),
+                            tint = Color.DarkGray
+                        )
+                    }
+                }
                 IconButton(onClick = { onValueChange("") }, modifier = Modifier.size(48.dp)) {
-                    Image(
+                    Icon(
                         painter = painterResource(Res.drawable.cancel_symbol),
                         contentDescription = stringResource(Res.string.clear),
-                    )
+                        )
                 }
             }
         }
         HorizontalDivider(color = OnSurfaceVariant, thickness = 1.dp)
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun LoginScreenPreview() {
-//    LoginScreen()
-//}

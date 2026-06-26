@@ -1,11 +1,8 @@
 package edu.moravian.csci215.misophoniaapp.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,17 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,20 +25,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
-import misophoniaapp.composeapp.generated.resources.cancel_symbol
+import misophoniaapp.composeapp.generated.resources.back_arrow
+import misophoniaapp.composeapp.generated.resources.clear
 import misophoniaapp.composeapp.generated.resources.create_account
+import misophoniaapp.composeapp.generated.resources.go_back
 import misophoniaapp.composeapp.generated.resources.name
 import misophoniaapp.composeapp.generated.resources.password
 import misophoniaapp.composeapp.generated.resources.phone_number
@@ -59,7 +48,8 @@ data object CreateAccount
 @Composable
 fun CreateAccountScreen(
     onCreateAccount: (String, String, String) -> Unit,
-    toHub: () -> Unit
+    toHub: () -> Unit,
+    goBack: () -> Unit
 ) {
     var phoneNumber by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
@@ -96,22 +86,30 @@ fun CreateAccountScreen(
                 value = phoneNumber,
                 onValueChange = { phoneNumber = it },
                 label = stringResource(Res.string.phone_number),
-                keyboardType = KeyboardType.Phone,
+                keyboardType = KeyboardType.Phone
             )
 
             FilledTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = stringResource(Res.string.name)
+                label = stringResource(Res.string.name),
             )
-
-
 
             FilledTextField(
                 value = password,
                 onValueChange = { password = it },
                 label = stringResource(Res.string.password),
                 keyboardType = KeyboardType.Password,
+                isPassword = true
+            )
+        }
+
+        IconButton(onClick = goBack, modifier = Modifier.size(48.dp)) {
+            Icon(
+                painter = painterResource(Res.drawable.back_arrow),
+                contentDescription = stringResource(Res.string.go_back),
+                modifier = Modifier.size(24.dp),
+                tint = Color.DarkGray
             )
         }
 

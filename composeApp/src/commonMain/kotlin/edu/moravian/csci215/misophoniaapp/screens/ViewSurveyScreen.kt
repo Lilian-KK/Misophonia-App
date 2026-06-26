@@ -73,8 +73,7 @@ fun ViewSurveyScreen(
     }
 
     Column(
-        modifier =
-            Modifier
+        modifier = Modifier
                 .safeContentPadding()
                 .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(4.dp),
