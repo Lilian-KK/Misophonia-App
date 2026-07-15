@@ -258,3 +258,12 @@ fun SurveyType.toElementsList(): List<SurveyElement> {
     println(surveyType)
     return surveyType
 }
+
+fun SurveyType.toStringName(): String {
+    val surveyType = when (this) {
+        SurveyType.AMISOSR_SURVEY -> "AMISOSR Survey"
+        SurveyType.DUKE_SURVEY -> "Duke Misophonia Questionnaire"
+        SurveyType.TRIGGER_LOG_SURVEY -> "Trigger Log Record"
+    }
+    return surveyType
+}

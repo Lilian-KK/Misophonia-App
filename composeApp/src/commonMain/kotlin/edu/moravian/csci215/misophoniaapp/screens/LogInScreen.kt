@@ -1,6 +1,8 @@
 package edu.moravian.csci215.misophoniaapp.screens
 
-import androidx.compose.foundation.Image
+import BadRequestException
+import ErrorResponse
+import UnauthorizedException
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,7 +25,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -44,7 +45,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.ktor.http.HttpStatusCode
+import edu.moravian.csci215.misophoniaapp.server_data.LoginResponse
+import io.ktor.client.call.body
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
@@ -55,7 +57,6 @@ import misophoniaapp.composeapp.generated.resources.closed_eye
 import misophoniaapp.composeapp.generated.resources.forgot_password
 import misophoniaapp.composeapp.generated.resources.go_back
 import misophoniaapp.composeapp.generated.resources.hide_password
-import misophoniaapp.composeapp.generated.resources.history
 import misophoniaapp.composeapp.generated.resources.incorrect_credentials
 import misophoniaapp.composeapp.generated.resources.login
 import misophoniaapp.composeapp.generated.resources.open_eye
@@ -74,7 +75,8 @@ data object LogIn
 
 @Composable
 fun LoginScreen(
-    onLogin: suspend (String, String) -> HttpStatusCode,
+    onLogin: suspend (String, String) -> LoginResponse,
+    storeTokens: suspend (String, String) -> Unit,
     toHub: () -> Unit,
     onForgotPassword: () -> Unit,
     showSnackbar: (String) -> Unit,
@@ -131,17 +133,19 @@ fun LoginScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 16.dp),
         ) {
-            val incorrectCredentialsMessage = stringResource(Res.string.incorrect_credentials)
             Button(
                 onClick = {
                     coroutineScope.launch {
-                        val loginStatus = onLogin(phoneNumber, password)
-                    if (loginStatus == HttpStatusCode.OK) {
-                        toHub()
-                    } else {
-                        showSnackbar(incorrectCredentialsMessage)
-                    }
-                } },
+                        try {
+                            val tokenResponse = onLogin(phoneNumber, password)
+                            println(tokenResponse)
+                            storeTokens(tokenResponse.access_token, tokenResponse.refresh_token)
+                            toHub()
+                        } catch (exception: UnauthorizedException) {
+                            val error = exception.response?.body<ErrorResponse>()
+                            showSnackbar(error?.message ?: "")
+                        }
+                    } },
                 modifier =
                     Modifier
                         .fillMaxWidth()

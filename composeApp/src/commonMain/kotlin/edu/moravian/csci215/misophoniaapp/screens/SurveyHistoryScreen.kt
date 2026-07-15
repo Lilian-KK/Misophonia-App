@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import edu.moravian.csci215.misophoniaapp.formatEpochMillis
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyRepository
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyType
+import edu.moravian.csci215.misophoniaapp.survey_data.toStringName
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
 import misophoniaapp.composeapp.generated.resources.date
@@ -58,7 +59,7 @@ fun SurveyHistoryScreen(
             items(entries, key = { it.id }) { result ->
                 Card(modifier = Modifier.fillMaxWidth().clickable { onViewPastSurvey(result.id, result.surveyType) }) {
                     Column(modifier = Modifier.padding(12.dp)) {
-                        Text(stringResource(Res.string.survey_type, result.surveyType))
+                        Text(stringResource(Res.string.survey_type, result.surveyType.toStringName()))
                         Text(stringResource(Res.string.date, formatEpochMillis(result.completedAtEpochMillis)))
                         Text(stringResource(Res.string.score, result.totalScore))
                     }

@@ -77,8 +77,16 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json) // added for ktor
 
             implementation("io.ktor:ktor-client-auth:3.5.0") // added for ktor auths
+            implementation("androidx.datastore:datastore:1.2.1") // added for jetpack preferences datastore
+            implementation("androidx.datastore:datastore-preferences:1.2.1") // added for jetpack preferences datastore
+            implementation("androidx.datastore:datastore-preferences-core:1.2.1") // added for jetpack preferences datastore
+
 
             implementation("ca.solo-studios:kt-fuzzy:0.1.0") // added for fuzzy kotlin string comparison
+
+            implementation("androidx.datastore:datastore-preferences-rxjava2:1.2.1") // rxjava2
+            implementation("androidx.datastore:datastore-preferences-rxjava3:1.2.1") // rxjava3
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

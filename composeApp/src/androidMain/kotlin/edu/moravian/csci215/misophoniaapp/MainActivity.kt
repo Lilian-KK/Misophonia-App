@@ -7,9 +7,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
+import edu.moravian.csci215.misophoniaapp.server_data.TokenStorage
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyRepository
 
 class MainActivity : ComponentActivity() {
@@ -17,11 +16,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         val repository = SurveyRepository(createSurveyDatabase(applicationContext).surveyResultDao())
+        val tokenStorage = TokenStorage
 
         requestBLEPermissions()
 
         setContent {
-            App(repository = repository)
+            App(
+                repository = repository,
+                tokenStorage = tokenStorage
+            )
         }
     }
     private fun requestBLEPermissions() {

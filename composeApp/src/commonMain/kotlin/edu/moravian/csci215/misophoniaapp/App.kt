@@ -26,6 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -60,6 +63,8 @@ import edu.moravian.csci215.misophoniaapp.screens.ViewSurvey
 import edu.moravian.csci215.misophoniaapp.screens.ViewSurveyScreen
 import edu.moravian.csci215.misophoniaapp.screens.WifiNetworks
 import edu.moravian.csci215.misophoniaapp.screens.WifiNetworksScreen
+import edu.moravian.csci215.misophoniaapp.server_data.AuthAPI
+import edu.moravian.csci215.misophoniaapp.server_data.TokenStorage
 import edu.moravian.csci215.misophoniaapp.server_data.createAccount
 import edu.moravian.csci215.misophoniaapp.server_data.logIn
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyElement
@@ -68,9 +73,14 @@ import edu.moravian.csci215.misophoniaapp.survey_data.SurveyType
 import edu.moravian.csci215.misophoniaapp.survey_data.SurveyVM
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.HttpResponseValidator
+import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.http.ContentType
 import io.ktor.http.URLProtocol
+import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -88,16 +98,17 @@ import misophoniaapp.composeapp.generated.resources.wifi
 import misophoniaapp.composeapp.generated.resources.wifi_settings_button
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import responseValidator
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 @Preview
-fun App(repository: SurveyRepository) {
+fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
     val navController = rememberNavController()
     val coroutineScope = rememberCoroutineScope()
-    val isSetup = false
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    var isLoggedIn by remember {mutableStateOf<Boolean?>(false)}
 
     val httpClient = remember {
         HttpClient(CIO) {
@@ -108,11 +119,26 @@ fun App(repository: SurveyRepository) {
                     host = "10.0.2.2"
                     port = 8000
                 }
+                contentType(ContentType.Application.Json)
             }
+            expectSuccess = true
+            HttpResponseValidator { handleResponseExceptionWithRequest(::responseValidator) }
             install(ContentNegotiation) {
                 json(Json { ignoreUnknownKeys = true })
             }
+            install(Auth) {
+                bearer {
+                    sendWithoutRequest { true }
+                    loadTokens{AuthAPI.loadTokens()}
+                    //refreshTokens(AuthAPI::refreshTokens)
+                }
+            }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        isLoggedIn = tokenStorage.refreshToken.first() != null
+        println(tokenStorage.refreshToken.first())
     }
 
     val currentScreen = navBackStackEntry?.destination?.route
@@ -182,7 +208,7 @@ fun App(repository: SurveyRepository) {
         ) {
             NavHost(
                 navController,
-                startDestination = if (isSetup) Hub else Setup,
+                startDestination = if (isLoggedIn == true) Hub else Setup
             ) {
                 composable<Setup> {
                     SetupScreen(
@@ -193,8 +219,11 @@ fun App(repository: SurveyRepository) {
                 composable<LogIn> {
                     LoginScreen(
                         onLogin = { phoneNumber: String, password: String ->
-                            logIn(httpClient, phoneNumber, password)
-                        },
+                            logIn(httpClient, phoneNumber, password) },
+                        storeTokens = { accessToken: String, refreshToken: String ->
+                            coroutineScope.launch {
+                                tokenStorage.storeTokens(accessToken, refreshToken)
+                            } },
                         toHub = { navController.navigate(Hub) },
                         onForgotPassword = { navController.navigate(ForgotPassword) },
                         showSnackbar = {
@@ -249,7 +278,14 @@ fun App(repository: SurveyRepository) {
                     ViewSurveyScreen(surveyId, surveyType, repository)
                 }
                 composable<AppSettings> {
-                    AppSettingsScreen()
+                    AppSettingsScreen(
+                        clearTokens = {
+                            coroutineScope.launch {
+                                tokenStorage.wipeTokens()
+                            }
+                        },
+                        logOut = { navController.navigate(Setup) }
+                    )
                 }
                 composable<WifiNetworks> {
                     WifiNetworksScreen()
