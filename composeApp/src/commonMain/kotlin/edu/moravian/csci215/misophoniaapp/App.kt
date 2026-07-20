@@ -1,84 +1,43 @@
 package edu.moravian.csci215.misophoniaapp
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.*
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.juul.kable.Bluetooth
-import com.juul.kable.Filter
-import com.juul.kable.Peripheral
-import com.juul.kable.Scanner
-import com.juul.kable.characteristicOf
-import com.juul.kable.peripheral
-import edu.moravian.csci215.misophoniaapp.screens.AppSettings
-import edu.moravian.csci215.misophoniaapp.screens.AppSettingsScreen
-import edu.moravian.csci215.misophoniaapp.screens.CreateAccount
-import edu.moravian.csci215.misophoniaapp.screens.CreateAccountScreen
-import edu.moravian.csci215.misophoniaapp.screens.ForgotPassword
-import edu.moravian.csci215.misophoniaapp.screens.ForgotPasswordScreen
-import edu.moravian.csci215.misophoniaapp.screens.HeadphonesSettings
-import edu.moravian.csci215.misophoniaapp.screens.HeadphonesSettingsScreen
-import edu.moravian.csci215.misophoniaapp.screens.Hub
-import edu.moravian.csci215.misophoniaapp.screens.HubScreen
-import edu.moravian.csci215.misophoniaapp.screens.LogIn
-import edu.moravian.csci215.misophoniaapp.screens.LoginScreen
-import edu.moravian.csci215.misophoniaapp.screens.Setup
-import edu.moravian.csci215.misophoniaapp.screens.SetupScreen
-import edu.moravian.csci215.misophoniaapp.screens.SurveyCompanion
-import edu.moravian.csci215.misophoniaapp.screens.SurveyHistory
-import edu.moravian.csci215.misophoniaapp.screens.SurveyHistoryScreen
-import edu.moravian.csci215.misophoniaapp.screens.SurveyScreen
-import edu.moravian.csci215.misophoniaapp.screens.ViewSurvey
-import edu.moravian.csci215.misophoniaapp.screens.ViewSurveyScreen
-import edu.moravian.csci215.misophoniaapp.screens.WifiNetworks
-import edu.moravian.csci215.misophoniaapp.screens.WifiNetworksScreen
-import edu.moravian.csci215.misophoniaapp.server_data.AuthAPI
-import edu.moravian.csci215.misophoniaapp.server_data.TokenStorage
-import edu.moravian.csci215.misophoniaapp.server_data.createAccount
-import edu.moravian.csci215.misophoniaapp.server_data.logIn
-import edu.moravian.csci215.misophoniaapp.survey_data.SurveyElement
-import edu.moravian.csci215.misophoniaapp.survey_data.SurveyRepository
-import edu.moravian.csci215.misophoniaapp.survey_data.SurveyType
-import edu.moravian.csci215.misophoniaapp.survey_data.SurveyVM
+import edu.moravian.csci215.misophoniaapp.screens.*
+import edu.moravian.csci215.misophoniaapp.server_data.*
+import edu.moravian.csci215.misophoniaapp.survey_data.*
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLProtocol
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
@@ -86,16 +45,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import misophoniaapp.composeapp.generated.resources.Res
-import misophoniaapp.composeapp.generated.resources.app_settings_button
-import misophoniaapp.composeapp.generated.resources.compose_multiplatform
-import misophoniaapp.composeapp.generated.resources.headphones
-import misophoniaapp.composeapp.generated.resources.home_button
-import misophoniaapp.composeapp.generated.resources.hp_settings_button
-import misophoniaapp.composeapp.generated.resources.settings
-import misophoniaapp.composeapp.generated.resources.survey_history_button
-import misophoniaapp.composeapp.generated.resources.view_history
-import misophoniaapp.composeapp.generated.resources.wifi
-import misophoniaapp.composeapp.generated.resources.wifi_settings_button
+import misophoniaapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import responseValidator
@@ -108,7 +58,8 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
     val coroutineScope = rememberCoroutineScope()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    var isLoggedIn by remember {mutableStateOf<Boolean?>(false)}
+    var isLoaded by remember {mutableStateOf<Boolean>(false)}
+    var isLoggedIn by remember {mutableStateOf<Boolean>(false)}
 
     val httpClient = remember {
         HttpClient(CIO) {
@@ -129,8 +80,33 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
             install(Auth) {
                 bearer {
                     sendWithoutRequest { true }
-                    loadTokens{AuthAPI.loadTokens()}
-                    //refreshTokens(AuthAPI::refreshTokens)
+                    loadTokens { loadTokens(tokenStorage) }
+                    //refreshTokens(refreshTokens) //todo
+//                    refreshTokens {
+//                        val response = client.post("http://10.0.2.2:8000") {
+//                            markAsRefreshTokenRequest() // Prevents infinite loops
+//                            setBody(RefreshTokenRequest(refreshToken = tokenStorage.refreshToken))
+//                        }
+//
+//                        if (response.status == HttpStatusCode.OK) {
+//                            val newTokens = response.body<LoginResponse>()
+//
+//                            // 3. Save the newly issued tokens to secure storage
+//                            tokenStorage.storeTokens(newTokens.access_token, newTokens.refresh_token)
+//
+//                            // Return the new tokens so Ktor can automatically retry your original request
+//                            BearerTokens(newTokens.access_token, newTokens.refresh_token)
+//                        } else {
+//                            null // Refresh failed, clear session or redirect to login
+//                        }
+//                    }
+                    sendWithoutRequest { request ->
+                        //todo: confirm with server-side which endpoints do not require a provided bearer token
+                        val endpointsToSkip = listOf("/login", "/health")
+                        // Do NOT send the header if targeting the auth/refresh endpoint
+                        //!request.url.toString().contains("/login")
+                        !endpointsToSkip.any { request.url.toString().contains(it) }
+                    }
                 }
             }
         }
@@ -138,7 +114,13 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
 
     LaunchedEffect(Unit) {
         isLoggedIn = tokenStorage.refreshToken.first() != null
-        println(tokenStorage.refreshToken.first())
+        println("isLoggedIn:" + tokenStorage.refreshToken.first())
+        isLoaded = true
+    }
+
+    if (!isLoaded) {
+        LoadingScreen()
+        return
     }
 
     val currentScreen = navBackStackEntry?.destination?.route
@@ -243,11 +225,14 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
                 composable<CreateAccount> {
                     CreateAccountScreen(
                         onCreateAccount = { phoneNumber: String, name: String, password: String ->
-                            coroutineScope.launch {
-                                createAccount(httpClient, phoneNumber, name, password)
-                            }
+                            createAccount(httpClient, phoneNumber, name, password)
                         },
                         toHub = { navController.navigate(Hub) },
+                        showSnackbar = {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(it)
+                            }
+                        },
                         goBack = { navController.navigateUp() }
                     )
                 }

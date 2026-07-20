@@ -78,8 +78,7 @@ fun SetupScreen(
     }
 
     Column(
-        modifier =
-            Modifier
+        modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
                 .padding(horizontal = 16.dp),
@@ -144,8 +143,7 @@ fun SetupScreen(
                 .fillMaxWidth()
                 .height(56.dp),
             shape = RoundedCornerShape(100.dp),
-            colors =
-                ButtonDefaults.buttonColors(
+            colors = ButtonDefaults.buttonColors(
                     containerColor = Color(0xFF6750A4),
                     contentColor = Color.White,
                 ),
@@ -161,10 +159,11 @@ fun SetupScreen(
     }
 }
 
-//to do:
+//todo:
 //filter out unnamed devices, show the user a list of all available peripherals to select
 //nimBLE
 //let them connect to one, once they connect to it display information (characteristics?) about it
+//also put this in a separate bluetooth/wifi folder
 suspend fun scanKable() {
     println("proof that testingkable is running")
     val advertisement = Scanner {

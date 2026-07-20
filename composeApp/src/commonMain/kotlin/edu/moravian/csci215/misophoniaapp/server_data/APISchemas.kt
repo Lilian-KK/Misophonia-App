@@ -1,5 +1,7 @@
 package edu.moravian.csci215.misophoniaapp.server_data
 
+import edu.moravian.csci215.misophoniaapp.server_data.TokenStorage.accessToken
+import edu.moravian.csci215.misophoniaapp.server_data.TokenStorage.refreshToken
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.auth.providers.BearerTokens
@@ -93,12 +95,6 @@ suspend fun logIn(
         )
     }.body()
 
-//.body<TokenResponse>().token (when returning just the token as a string)
-
-fun loadTokens() {
-
-}
-
 fun refreshTokens() {
 
 }
@@ -107,19 +103,13 @@ fun saveNewTokens() {
 
 }
 
-fun markAsSkipped() {
+suspend fun loadTokens(tokenStorage: TokenStorage): BearerTokens? {
+    val accessToken = tokenStorage.accessToken.first()
+    val refreshToken = tokenStorage.refreshToken.first()
 
-}
-
-object AuthAPI {
-    suspend fun loadTokens(): BearerTokens? {
-        val accessToken = TokenStorage.accessToken.first()
-        val refreshToken = TokenStorage.refreshToken.first()
-
-        return if (accessToken != null && refreshToken != null) {
-            BearerTokens(accessToken, refreshToken)
-        } else {
-            null
-        }
+    return if (accessToken != null && refreshToken != null) {
+        BearerTokens(accessToken, refreshToken)
+    } else {
+        null
     }
 }

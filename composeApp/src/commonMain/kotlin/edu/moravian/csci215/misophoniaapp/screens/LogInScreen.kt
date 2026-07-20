@@ -1,6 +1,5 @@
 package edu.moravian.csci215.misophoniaapp.screens
 
-import BadRequestException
 import ErrorResponse
 import UnauthorizedException
 import androidx.compose.foundation.background
@@ -127,14 +126,11 @@ fun LoginScreen(
             )
         }
 
-        Box(
-            modifier =
-                Modifier
+        Box(modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 16.dp),
-        ) {
-            Button(
-                onClick = {
+        ) { Button(
+            onClick = {
                     coroutineScope.launch {
                         try {
                             val tokenResponse = onLogin(phoneNumber, password)
@@ -145,9 +141,9 @@ fun LoginScreen(
                             val error = exception.response?.body<ErrorResponse>()
                             showSnackbar(error?.message ?: "")
                         }
+                        //todo add more exceptions
                     } },
-                modifier =
-                    Modifier
+                modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
                 shape = RoundedCornerShape(28.dp),
