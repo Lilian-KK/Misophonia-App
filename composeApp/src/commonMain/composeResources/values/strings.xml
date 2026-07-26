@@ -55,7 +55,7 @@
     <string name="continue_">Continue</string>
 
     <!--CreateAccountScreen-->
-    <string name="name">Name</string>
+    <string name="username">Username</string>
     <string name="password">Password</string>
 
     <!--LogInScreen-->

@@ -1,5 +1,7 @@
-package edu.moravian.csci215.misophoniaapp.screens
+package edu.moravian.csci215.misophoniaapp.screens.login
 
+import ErrorResponse
+import UnauthorizedException
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -26,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,13 +42,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import edu.moravian.csci215.misophoniaapp.server_data.LoginResponse
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.ServerResponseException
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
 import misophoniaapp.composeapp.generated.resources.back_arrow
-import misophoniaapp.composeapp.generated.resources.clear
 import misophoniaapp.composeapp.generated.resources.continue_
 import misophoniaapp.composeapp.generated.resources.didnt_get_code
 import misophoniaapp.composeapp.generated.resources.enter_code
@@ -54,22 +60,30 @@ import misophoniaapp.composeapp.generated.resources.go_back
 import misophoniaapp.composeapp.generated.resources.phone_number
 import misophoniaapp.composeapp.generated.resources.send_another_code
 import misophoniaapp.composeapp.generated.resources.send_code
+import misophoniaapp.composeapp.generated.resources.username
 import misophoniaapp.composeapp.generated.resources.verify_for_pw_creation
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Serializable
-data object ForgotPassword
+data class CodeLogin (
+    val username: String
+)
 
 @Composable
-fun ForgotPasswordScreen(
-    onContinue: () -> Unit = {},
-    goBack: () -> Unit
+fun CodeLoginScreen(
+    username: String,
+    goBack: () -> Unit,
+    storeTokens: suspend (String, String) -> Unit,
+    showSnackbar: (String) -> Unit,
+    toHub: () -> Unit = {},
+    sendCode: suspend (String) -> Unit,
+    onLogin: suspend (String, String, String) -> LoginResponse
 ) {
-    var phoneNumber by remember { mutableStateOf("") }
     var codeSent by remember { mutableStateOf(false) }
     var code by remember { mutableStateOf(listOf("", "", "", "", "", "")) }
     val focusRequesters = remember { List(6) { FocusRequester() } }
+    val coroutineScope = rememberCoroutineScope()
 
     LazyColumn(
         modifier =
@@ -81,7 +95,8 @@ fun ForgotPasswordScreen(
     ) {
         item {
             Text(
-                text = stringResource(Res.string.forgot_password),
+                //text = stringResource(Res.string.forgot_password),
+                text = "Code Login",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Normal,
                 lineHeight = 36.sp,
@@ -97,7 +112,7 @@ fun ForgotPasswordScreen(
 
         item {
             Text(
-                text = stringResource(Res.string.verify_for_pw_creation),
+                text = "Please click the button and enter the 6-digit code that was sent to your phone.",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Normal,
                 lineHeight = 20.sp,
@@ -114,12 +129,16 @@ fun ForgotPasswordScreen(
 
         item {
             FilledTextField(
-                value = phoneNumber,
-                onValueChange = { phoneNumber = it },
-                label = stringResource(Res.string.phone_number),
-                keyboardType = KeyboardType.Phone
+                value = username,
+                label = stringResource(Res.string.username),
+                keyboardType = KeyboardType.Text
             )
         }
+
+        item {
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+
 
         if (!codeSent) {
             item {
@@ -128,7 +147,17 @@ fun ForgotPasswordScreen(
 
             item {
                 Button(
-                    onClick = { codeSent = true },
+                    onClick = {
+                        coroutineScope.launch {
+                            try {
+                                sendCode(username)
+                                codeSent = true
+                            } catch (exception: ServerResponseException) {
+                                val error = exception.response?.body<ErrorResponse>()
+                                showSnackbar(error?.message ?: "")
+                            }
+                        } }
+                    ,
                     modifier =
                         Modifier
                             .fillMaxWidth()
@@ -235,7 +264,20 @@ fun ForgotPasswordScreen(
 
             item {
                 Button(
-                    onClick = onContinue,
+                    onClick = {
+                        toHub()
+                        coroutineScope.launch {
+                            try {
+                                val tokenResponse = onLogin(username, "code", code.joinToString())
+                                println(tokenResponse)
+                                storeTokens(tokenResponse.access_token, tokenResponse.refresh_token)
+                                toHub()
+                            } catch (exception: UnauthorizedException) {
+                                val error = exception.response?.body<ErrorResponse>()
+                                showSnackbar(error?.message ?: "")
+                            }
+                            //todo add more exceptions
+                        } },
                     modifier =
                         Modifier
                             .fillMaxWidth()
@@ -269,7 +311,7 @@ fun ForgotPasswordScreen(
 }
 
 @Composable
-private fun CodeChip(
+fun CodeChip(
     value: String,
     focusRequester: FocusRequester,
     onValueChange: (String) -> Unit,

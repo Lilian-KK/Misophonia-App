@@ -3,21 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
-
     <!-- so that the phone can look for bluetooth devices -->
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
-
     <!-- lets the app discover bluetooth devices locally (app-initiated) and manipulate bluetooth settings -->
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-
     <!-- so that the phone can be made discoverable to other bluetooth devices -->
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
-
     <!-- so that the app can communicate with paired devices -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-
     <!-- so that the app can get the location of the peripheral -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- for scanning Wi-Fi networks -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- for android 11 or under -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />

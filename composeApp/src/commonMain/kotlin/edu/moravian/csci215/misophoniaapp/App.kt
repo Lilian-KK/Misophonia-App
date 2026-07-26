@@ -5,12 +5,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,21 +17,18 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import edu.moravian.csci215.misophoniaapp.screens.*
+import edu.moravian.csci215.misophoniaapp.screens.login.*
+import edu.moravian.csci215.misophoniaapp.screens.registration.*
 import edu.moravian.csci215.misophoniaapp.server_data.*
 import edu.moravian.csci215.misophoniaapp.survey_data.*
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.auth.Auth
-import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLProtocol
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
@@ -81,7 +72,7 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
                 bearer {
                     sendWithoutRequest { true }
                     loadTokens { loadTokens(tokenStorage) }
-                    //refreshTokens(refreshTokens) //todo
+//                    refreshTokens(refreshTokens) //todo
 //                    refreshTokens {
 //                        val response = client.post("http://10.0.2.2:8000") {
 //                            markAsRefreshTokenRequest() // Prevents infinite loops
@@ -194,46 +185,97 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
             ) {
                 composable<Setup> {
                     SetupScreen(
-                        onLogin = { navController.navigate(LogIn) },
+                        onLogin = { navController.navigate(BaseLogin) },
                         onCreateAccount = { navController.navigate(CreateAccount) },
                     )
                 }
-                composable<LogIn> {
-                    LoginScreen(
-                        onLogin = { phoneNumber: String, password: String ->
-                            logIn(httpClient, phoneNumber, password) },
-                        storeTokens = { accessToken: String, refreshToken: String ->
-                            coroutineScope.launch {
-                                tokenStorage.storeTokens(accessToken, refreshToken)
-                            } },
-                        toHub = { navController.navigate(Hub) },
-                        onForgotPassword = { navController.navigate(ForgotPassword) },
+                composable<BaseLogin> {
+                    BaseLoginScreen(
                         showSnackbar = {
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(it)
                             }
                         },
-                        goBack =  { navController.navigateUp() }
+                        toCodeLogin = { username: String -> navController.navigate(CodeLogin(username)) },
+                        toPasswordLogin = { username: String -> navController.navigate(PasswordLogin(username)) },
+                        goBack = { navController.navigateUp() }
                     )
                 }
-                composable<ForgotPassword> {
-                    ForgotPasswordScreen(
-                        onContinue = { navController.navigate(Hub) },
-                        goBack =  { navController.navigateUp() }
+                composable<CodeLogin> { navBackStackEntry ->
+                    val username = navBackStackEntry.toRoute<CodeLogin>().username
+                    CodeLoginScreen(
+                        username = username,
+                        goBack = { navController.navigateUp() },
+                        storeTokens = { accessToken: String, refreshToken: String ->
+                            coroutineScope.launch {
+                                tokenStorage.storeTokens(accessToken, refreshToken)
+                            }
+                        },
+                        showSnackbar = {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(it)
+                            }
+                        },
+                        toHub = { navController.navigate(Hub) },
+                        sendCode = { username: String ->
+                            sendLoginCode(httpClient, username) },
+                        onLogin = { username: String, login_method: String, login_value: String ->
+                            logIn(httpClient, username, login_method, login_value)
+                        }
+                    )
+                }
+                composable<PasswordLogin> { navBackStackEntry ->
+                    val username = navBackStackEntry.toRoute<PasswordLogin>().username
+                    PasswordLoginScreen(
+                        username = username,
+                        goBack = { navController.navigateUp() },
+                        storeTokens = { accessToken: String, refreshToken: String ->
+                            coroutineScope.launch {
+                                tokenStorage.storeTokens(accessToken, refreshToken)
+                            }
+                        },
+                        showSnackbar = {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(it)
+                            }
+                        },
+                        toHub = { navController.navigate(Hub) },
+                        onLogin = { username: String, login_method: String, login_value: String ->
+                            logIn(httpClient, username, login_method, login_value)
+                        },
                     )
                 }
                 composable<CreateAccount> {
                     CreateAccountScreen(
-                        onCreateAccount = { phoneNumber: String, name: String, password: String ->
-                            createAccount(httpClient, phoneNumber, name, password)
-                        },
-                        toHub = { navController.navigate(Hub) },
                         showSnackbar = {
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(it)
                             }
                         },
-                        goBack = { navController.navigateUp() }
+                        goBack = { navController.navigateUp() },
+                        sendCode = { phoneNumber: String ->
+                            sendRegisterCode(httpClient, phoneNumber)
+                        },
+                        toVerifyPhoneNumber = { phoneNumber: String, username: String, password: String ->
+                            navController.navigate(VerifyPhoneNumber(phoneNumber, username, password))
+                        }
+                    )
+                }
+                composable<VerifyPhoneNumber> { navBackStackEntry ->
+                    val phoneNumber = navBackStackEntry.toRoute<VerifyPhoneNumber>().phoneNumber
+                    val username = navBackStackEntry.toRoute<VerifyPhoneNumber>().username
+                    val password = navBackStackEntry.toRoute<VerifyPhoneNumber>().password
+                    VerifyPhoneNumberScreen(
+                        showSnackbar = {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(it)
+                            }
+                        },
+                        goBack = { navController.navigateUp() },
+                        toHub = { navController.navigate(Hub)},
+                        createAccount = { code: String ->
+                            createAccount(httpClient, phoneNumber, code, username, password)
+                        },
                     )
                 }
                 composable<Hub> {
@@ -269,7 +311,8 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
                                 tokenStorage.wipeTokens()
                             }
                         },
-                        logOut = { navController.navigate(Setup) }
+                        logOut = { logout(httpClient, tokenStorage.refreshToken.first().toString()) }, //keep an eye on this one make sure its storing properly
+                        toSetup = { navController.navigate(Setup) }
                     )
                 }
                 composable<WifiNetworks> {

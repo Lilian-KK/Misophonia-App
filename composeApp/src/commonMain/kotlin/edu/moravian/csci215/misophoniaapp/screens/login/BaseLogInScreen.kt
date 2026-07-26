@@ -1,4 +1,4 @@
-package edu.moravian.csci215.misophoniaapp.screens
+package edu.moravian.csci215.misophoniaapp.screens.login
 
 import ErrorResponse
 import UnauthorizedException
@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -46,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.moravian.csci215.misophoniaapp.server_data.LoginResponse
 import io.ktor.client.call.body
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
@@ -56,47 +59,39 @@ import misophoniaapp.composeapp.generated.resources.closed_eye
 import misophoniaapp.composeapp.generated.resources.forgot_password
 import misophoniaapp.composeapp.generated.resources.go_back
 import misophoniaapp.composeapp.generated.resources.hide_password
-import misophoniaapp.composeapp.generated.resources.incorrect_credentials
 import misophoniaapp.composeapp.generated.resources.login
 import misophoniaapp.composeapp.generated.resources.open_eye
 import misophoniaapp.composeapp.generated.resources.password
 import misophoniaapp.composeapp.generated.resources.phone_number
 import misophoniaapp.composeapp.generated.resources.show_password
+import misophoniaapp.composeapp.generated.resources.username
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 val SurfaceContainerHighest = Color(0xFFE6E0E9)
 val OnSurfaceVariant = Color(0xFF49454F)
-private val Primary = Color(0xFF6750A4)
+val Primary = Color(0xFF6750A4)
 
 @Serializable
-data object LogIn
+data object BaseLogin
 
 @Composable
-fun LoginScreen(
-    onLogin: suspend (String, String) -> LoginResponse,
-    storeTokens: suspend (String, String) -> Unit,
-    toHub: () -> Unit,
-    onForgotPassword: () -> Unit,
+fun BaseLoginScreen(
     showSnackbar: (String) -> Unit,
+    toCodeLogin: (String) -> Unit,
+    toPasswordLogin: (String) -> Unit,
     goBack: () -> Unit
 ) {
-    val (phoneNumber, setPhoneNumber) = remember { mutableStateOf("") }
-    val (password, setPassword) = remember { mutableStateOf("")}
+    val (username, setUsername) = remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
 
-    Column(
-        modifier =
-            Modifier
+    Column(modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
                 .statusBarsPadding()
                 .navigationBarsPadding()
                 .imePadding(),
-    ) {
-        Column(
-            modifier =
-                Modifier
+    ) { Column(modifier = Modifier
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp),
@@ -115,108 +110,38 @@ fun LoginScreen(
                         .fillMaxWidth()
                         .padding(top = 8.dp),
             )
-
-            LoginFields(
-                onForgotPassword = onForgotPassword,
-                phoneNumber = phoneNumber,
-                setPhoneNumber = setPhoneNumber,
-                password = password,
-                setPassword = setPassword,
-                goBack = goBack
-            )
         }
-
-        Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp),
-        ) { Button(
-            onClick = {
-                    coroutineScope.launch {
-                        try {
-                            val tokenResponse = onLogin(phoneNumber, password)
-                            println(tokenResponse)
-                            storeTokens(tokenResponse.access_token, tokenResponse.refresh_token)
-                            toHub()
-                        } catch (exception: UnauthorizedException) {
-                            val error = exception.response?.body<ErrorResponse>()
-                            showSnackbar(error?.message ?: "")
-                        }
-                        //todo add more exceptions
-                    } },
-                modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                shape = RoundedCornerShape(28.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Primary),
-            ) {
-                Text(
-                    text = stringResource(Res.string.login),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    lineHeight = 24.sp,
-                    letterSpacing = 0.15.sp,
-                    color = Color.White,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun LoginFields(
-    onForgotPassword: () -> Unit,
-    phoneNumber: String,
-    setPhoneNumber: (String) -> Unit,
-    password: String,
-    setPassword: (String) -> Unit,
-    goBack: () -> Unit
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(32.dp)) {
         FilledTextField(
-            value = phoneNumber,
-            onValueChange = setPhoneNumber,
-            label = stringResource(Res.string.phone_number),
-            keyboardType = KeyboardType.Phone
-        )
-
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilledTextField(
-                value = password,
-                onValueChange = setPassword,
-                label = stringResource(Res.string.password),
-                keyboardType = KeyboardType.Password,
-                isPassword = true
+            value = username,
+            onValueChange = setUsername,
+            label = stringResource(Res.string.username)
             )
+        Button(
+            onClick = { if (username.isEmpty()) {
+                coroutineScope.launch {
+                    showSnackbar("Field left blank")
+                }
+            } else toCodeLogin(username) }
+        ) {
+            Text("Log in with phone code")
+        }
+        Button(
+            onClick = { if (username.isEmpty()) {
+                coroutineScope.launch {
+                    showSnackbar("Field left blank")
+                }
+            } else toPasswordLogin(username) }
+        ) {
+            Text("Log in with password")
+        }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                IconButton(onClick = goBack, modifier = Modifier.size(48.dp)) {
-                    Icon(
-                        painter = painterResource(Res.drawable.back_arrow),
-                        modifier = Modifier.size(24.dp),
-                        contentDescription = stringResource(Res.string.go_back),
-                        tint = Color.DarkGray
-                    )
-                }
-                TextButton(
-                    onClick = onForgotPassword,
-                    contentPadding =
-                        androidx.compose.foundation.layout
-                            .PaddingValues(0.dp),
-                ) {
-                    Text(
-                        text = stringResource(Res.string.forgot_password),
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Medium,
-                        lineHeight = 16.sp,
-                        letterSpacing = 0.5.sp,
-                        color = OnSurfaceVariant,
-                        textDecoration = TextDecoration.Underline,
-                    )
-                }
-            }
+        IconButton(onClick = goBack, modifier = Modifier.size(48.dp)) {
+            Icon(
+                painter = painterResource(Res.drawable.back_arrow),
+                modifier = Modifier.size(24.dp),
+                contentDescription = stringResource(Res.string.go_back),
+                tint = Color.DarkGray
+            )
         }
     }
 }
@@ -224,7 +149,7 @@ private fun LoginFields(
 @Composable
 fun FilledTextField(
     value: String,
-    onValueChange: (String) -> Unit,
+    onValueChange: (String) -> Unit = {},
     label: String,
     keyboardType: KeyboardType = KeyboardType.Text,
     isPassword: Boolean = false
@@ -254,7 +179,7 @@ fun FilledTextField(
                         letterSpacing = 0.4.sp,
                         color = OnSurfaceVariant,
                     )
-                    androidx.compose.foundation.text.BasicTextField(
+                    BasicTextField(
                         value = value,
                         onValueChange = onValueChange,
                         singleLine = true,

@@ -1,30 +1,12 @@
-package edu.moravian.csci215.misophoniaapp.screens
+package edu.moravian.csci215.misophoniaapp.screens.registration
 
-import ConflictException
-import ErrorResponse
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,16 +15,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
+import edu.moravian.csci215.misophoniaapp.screens.login.FilledTextField
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
 import misophoniaapp.composeapp.generated.resources.back_arrow
-import misophoniaapp.composeapp.generated.resources.clear
 import misophoniaapp.composeapp.generated.resources.create_account
 import misophoniaapp.composeapp.generated.resources.go_back
-import misophoniaapp.composeapp.generated.resources.name
+import misophoniaapp.composeapp.generated.resources.username
 import misophoniaapp.composeapp.generated.resources.password
 import misophoniaapp.composeapp.generated.resources.phone_number
 import org.jetbrains.compose.resources.painterResource
@@ -53,13 +33,13 @@ data object CreateAccount
 
 @Composable
 fun CreateAccountScreen(
-    onCreateAccount: suspend (String, String, String) -> Unit,
     showSnackbar: (String) -> Unit,
-    toHub: () -> Unit,
-    goBack: () -> Unit
+    goBack: () -> Unit,
+    sendCode: suspend (String) -> Unit,
+    toVerifyPhoneNumber: (String, String, String) -> Unit
 ) {
+    var username by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }
-    var name by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
 
@@ -89,16 +69,16 @@ fun CreateAccountScreen(
         )
         Column(verticalArrangement = Arrangement.spacedBy(32.dp)) {
             FilledTextField(
+                value = username,
+                onValueChange = { username = it },
+                label = stringResource(Res.string.username),
+            )
+
+            FilledTextField(
                 value = phoneNumber,
                 onValueChange = { phoneNumber = it },
                 label = stringResource(Res.string.phone_number),
                 keyboardType = KeyboardType.Phone
-            )
-
-            FilledTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = stringResource(Res.string.name),
             )
 
             FilledTextField(
@@ -124,15 +104,10 @@ fun CreateAccountScreen(
         Button(
             onClick = {
                 coroutineScope.launch {
-                    try {
-                        onCreateAccount(phoneNumber, name, password)
-                        toHub()
-                    } catch (exception: ConflictException) {
-                        val error = exception.response?.body<ErrorResponse>()
-                        showSnackbar(error?.message ?: "")
-                    }
+                    sendCode(phoneNumber)
                 }
-            },
+                toVerifyPhoneNumber(phoneNumber, username, password)
+                      },
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -143,7 +118,7 @@ fun CreateAccountScreen(
                     containerColor = primaryColor,
                     contentColor = Color.White,
                 ),
-            enabled = phoneNumber.isNotEmpty() && name.isNotEmpty() && password.isNotEmpty(),
+            enabled = phoneNumber.isNotEmpty() && username.isNotEmpty() && password.isNotEmpty(),
         ) {
             Text(
                 text = stringResource(Res.string.create_account),

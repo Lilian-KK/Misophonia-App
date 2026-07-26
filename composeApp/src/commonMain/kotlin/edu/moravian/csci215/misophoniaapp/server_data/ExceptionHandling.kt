@@ -1,6 +1,7 @@
 import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.request.HttpRequest
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
@@ -51,6 +52,7 @@ suspend fun responseValidator(exception: Throwable, request: HttpRequest) {
         HttpStatusCode.Forbidden -> throw ForbiddenException(message, response)
         HttpStatusCode.NotFound -> throw NotFoundException(message, response)
         HttpStatusCode.Conflict -> throw ConflictException(message, response)
+        HttpStatusCode.RequestTimeout -> throw RequestTimeoutException(message, response)
         HttpStatusCode.TooManyRequests -> throw TooManyRequestsException(message, response)
         else -> throw RequestException(message, response.status, response)
     }
