@@ -22,13 +22,19 @@ import edu.moravian.csci215.misophoniaapp.screens.registration.*
 import edu.moravian.csci215.misophoniaapp.server_data.*
 import edu.moravian.csci215.misophoniaapp.survey_data.*
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpResponseValidator
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerTokens
 import io.ktor.client.plugins.auth.providers.bearer
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLProtocol
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
@@ -68,16 +74,19 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
             install(ContentNegotiation) {
                 json(Json { ignoreUnknownKeys = true })
             }
+            install(HttpTimeout) {
+                requestTimeoutMillis = 15_000
+                connectTimeoutMillis = 15_000
+                socketTimeoutMillis = 15_000
+            }
             install(Auth) {
                 bearer {
                     sendWithoutRequest { true }
                     loadTokens { loadTokens(tokenStorage) }
-//                    refreshTokens(refreshTokens) //todo
+//
+//                    //this portion was created using Gemini:
 //                    refreshTokens {
-//                        val response = client.post("http://10.0.2.2:8000") {
-//                            markAsRefreshTokenRequest() // Prevents infinite loops
-//                            setBody(RefreshTokenRequest(refreshToken = tokenStorage.refreshToken))
-//                        }
+//                        val response = refresh(client = client, tokenStorage.refreshToken.first() ?: return@refreshTokens null)
 //
 //                        if (response.status == HttpStatusCode.OK) {
 //                            val newTokens = response.body<LoginResponse>()
@@ -218,7 +227,10 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
                         },
                         toHub = { navController.navigate(Hub) },
                         sendCode = { username: String ->
-                            sendLoginCode(httpClient, username) },
+                            coroutineScope.launch {
+                                sendLoginCode(httpClient, username)
+                            }
+                        },
                         onLogin = { username: String, login_method: String, login_value: String ->
                             logIn(httpClient, username, login_method, login_value)
                         }
@@ -254,7 +266,9 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
                         },
                         goBack = { navController.navigateUp() },
                         sendCode = { phoneNumber: String ->
-                            sendRegisterCode(httpClient, phoneNumber)
+                            coroutineScope.launch {
+                                sendRegisterCode(httpClient, phoneNumber)
+                            }
                         },
                         toVerifyPhoneNumber = { phoneNumber: String, username: String, password: String ->
                             navController.navigate(VerifyPhoneNumber(phoneNumber, username, password))
@@ -275,6 +289,9 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
                         toHub = { navController.navigate(Hub)},
                         createAccount = { code: String ->
                             createAccount(httpClient, phoneNumber, code, username, password)
+                        },
+                        sendCode = { phoneNumber: String ->
+                            sendRegisterCode(httpClient, phoneNumber)
                         },
                     )
                 }
@@ -311,8 +328,28 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
                                 tokenStorage.wipeTokens()
                             }
                         },
-                        logOut = { logout(httpClient, tokenStorage.refreshToken.first().toString()) }, //keep an eye on this one make sure its storing properly
-                        toSetup = { navController.navigate(Setup) }
+                        logOut = {
+                            coroutineScope.launch {
+                                logout(httpClient, tokenStorage.refreshToken.first().toString()) //keep an eye on this one make sure its storing properly
+                            }
+                                 },
+                        toSetup = { navController.navigate(Setup) },
+                        showSnackbar = {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(it)
+                            }
+                        },
+                        changePassword = { currentPassword: String, newPassword: String ->
+                            coroutineScope.launch {
+                                changePassword(httpClient, currentPassword, newPassword)
+                            }
+                        },
+                        changePhoneNumber = { newPhoneNumber: String, code: String ->
+                            coroutineScope.launch {
+                                changePhoneNumber(httpClient, newPhoneNumber, code)
+                            }
+
+                        }
                     )
                 }
                 composable<WifiNetworks> {

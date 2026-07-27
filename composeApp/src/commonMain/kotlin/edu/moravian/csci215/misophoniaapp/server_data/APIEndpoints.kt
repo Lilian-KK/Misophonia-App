@@ -6,7 +6,6 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import kotlinx.coroutines.flow.Flow
 
 suspend fun createAccount(
     client: HttpClient,
@@ -47,6 +46,7 @@ suspend fun logIn(
     login_method: String,
     login_value: String,
 ): LoginResponse = client.post("login") {
+    contentType(ContentType.Application.Json)
     setBody(
         LoginRequest(
             username = username,
@@ -61,6 +61,7 @@ suspend fun logout(
     refreshToken: String
 ) {
     client.post("logout") {
+        contentType(ContentType.Application.Json)
         setBody(
             LogoutRequest(
                 refresh_token = refreshToken
@@ -73,8 +74,8 @@ suspend fun sendLoginCode(
     client: HttpClient,
     username: String
 ) {
-    println("should be sending the login code")
     client.post("auth/send") {
+        contentType(ContentType.Application.Json)
         setBody(
             PhoneAuthPayload(
                 username = username
@@ -86,22 +87,21 @@ suspend fun sendLoginCode(
 suspend fun sendRegisterCode(
     client: HttpClient,
     phoneNumber: String
-) {
-    println("should be sending the create account code")
-    client.post("auth/send-initial") {
+) = client.post("auth/send-initial") {
+        contentType(ContentType.Application.Json)
         setBody(
             InitialPhoneAuthRequest(
                 phone_number = phoneNumber
             )
         )
     }
-}
 
 suspend fun refresh(
     client: HttpClient,
     refreshToken: String
 ): LoginResponse = client.post("refresh") {
-        setBody(
+    contentType(ContentType.Application.Json)
+    setBody(
             RefreshRequest(
                 refresh_token = refreshToken
             )
@@ -114,6 +114,8 @@ suspend fun changePassword(
     newPassword: String
 ) {
     client.post("change-pass") {
+        contentType(ContentType.Application.Json)
+
         setBody(
             ChangePasswordRequest(
                 current_password = currentPassword,
@@ -130,6 +132,8 @@ suspend fun resetPassword(
     newPassword: String
 ) {
     client.post("reset-pass") {
+        contentType(ContentType.Application.Json)
+
         setBody(
             ResetPasswordRequest(
                 username = username,
@@ -145,7 +149,8 @@ suspend fun changePhoneNumber(
     newPhoneNumber: String,
     code: String
 ): ChangePhoneResponse = client.post("change-phone") {
-        setBody(
+    contentType(ContentType.Application.Json)
+    setBody(
             ChangePhoneRequest(
                 new_number = newPhoneNumber,
                 code = code

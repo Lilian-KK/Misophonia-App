@@ -88,10 +88,6 @@ data class ChangePhoneResponse(
     val phone_number: String
 )
 
-fun refreshTokens() {
-
-}
-
 fun saveNewTokens() {
 
 }
@@ -105,4 +101,8 @@ suspend fun loadTokens(tokenStorage: TokenStorage): BearerTokens? {
     } else {
         null
     }
+}
+
+suspend fun refreshTokens(tokenStorage: TokenStorage) {
+
 }

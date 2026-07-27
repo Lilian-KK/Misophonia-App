@@ -56,7 +56,7 @@ data class PasswordLogin(
 fun PasswordLoginScreen(
     username: String,
     goBack: () -> Unit,
-    storeTokens: suspend (String, String) -> Unit,
+    storeTokens: (String, String) -> Unit,
     showSnackbar: (String) -> Unit,
     toHub: () -> Unit,
     onLogin: suspend (String, String, String) -> LoginResponse,

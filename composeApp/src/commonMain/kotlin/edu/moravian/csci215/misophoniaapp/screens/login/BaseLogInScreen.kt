@@ -118,18 +118,14 @@ fun BaseLoginScreen(
             )
         Button(
             onClick = { if (username.isEmpty()) {
-                coroutineScope.launch {
-                    showSnackbar("Field left blank")
-                }
+                showSnackbar("Field left blank")
             } else toCodeLogin(username) }
         ) {
             Text("Log in with phone code")
         }
         Button(
             onClick = { if (username.isEmpty()) {
-                coroutineScope.launch {
-                    showSnackbar("Field left blank")
-                }
+                showSnackbar("Field left blank")
             } else toPasswordLogin(username) }
         ) {
             Text("Log in with password")

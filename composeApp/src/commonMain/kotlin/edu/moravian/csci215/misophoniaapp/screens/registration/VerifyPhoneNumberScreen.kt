@@ -1,6 +1,6 @@
 package edu.moravian.csci215.misophoniaapp.screens.registration
 
-import ConflictException
+import BadRequestException
 import ErrorResponse
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import edu.moravian.csci215.misophoniaapp.screens.login.CodeChip
 import edu.moravian.csci215.misophoniaapp.server_data.UserResponse
 import io.ktor.client.call.body
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
@@ -50,6 +49,7 @@ fun VerifyPhoneNumberScreen(
     showSnackbar: (String) -> Unit,
     goBack: () -> Unit,
     toHub: () -> Unit,
+    sendCode: suspend (String) -> Unit, //todo add a resend code button like codelogin has
     createAccount: suspend (String) -> UserResponse,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -92,13 +92,15 @@ fun VerifyPhoneNumberScreen(
 
         Button(
             onClick = {
-                coroutineScope.launch {
-                    try {
-                        createAccount(code.joinToString())
-                        toHub()
-                    } catch (exception: ConflictException) {
+                try {
+                    coroutineScope.launch {
+                        createAccount(code.joinToString(""))
+                    }
+                    toHub()
+                } catch (exception: BadRequestException) {
+                    coroutineScope.launch {
                         val error = exception.response?.body<ErrorResponse>()
-                        showSnackbar(error?.message ?: "")
+                        showSnackbar(error?.message ?: "Bad Request Exception")
                     }
                 }
             }

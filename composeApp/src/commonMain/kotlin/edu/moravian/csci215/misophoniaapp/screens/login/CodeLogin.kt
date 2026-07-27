@@ -1,5 +1,6 @@
 package edu.moravian.csci215.misophoniaapp.screens.login
 
+import BadRequestException
 import ErrorResponse
 import UnauthorizedException
 import androidx.compose.foundation.background
@@ -77,7 +78,7 @@ fun CodeLoginScreen(
     storeTokens: suspend (String, String) -> Unit,
     showSnackbar: (String) -> Unit,
     toHub: () -> Unit = {},
-    sendCode: suspend (String) -> Unit,
+    sendCode: (String) -> Unit,
     onLogin: suspend (String, String, String) -> LoginResponse
 ) {
     var codeSent by remember { mutableStateOf(false) }
@@ -148,16 +149,15 @@ fun CodeLoginScreen(
             item {
                 Button(
                     onClick = {
-                        coroutineScope.launch {
-                            try {
-                                sendCode(username)
-                                codeSent = true
-                            } catch (exception: ServerResponseException) {
+                        try {
+                            sendCode(username)
+                            codeSent = true
+                        } catch (exception: ServerResponseException) {
+                            coroutineScope.launch {
                                 val error = exception.response?.body<ErrorResponse>()
                                 showSnackbar(error?.message ?: "")
                             }
-                        } }
-                    ,
+                        } },
                     modifier =
                         Modifier
                             .fillMaxWidth()
@@ -268,13 +268,16 @@ fun CodeLoginScreen(
                         toHub()
                         coroutineScope.launch {
                             try {
-                                val tokenResponse = onLogin(username, "code", code.joinToString())
+                                val tokenResponse = onLogin(username, "code", code.joinToString(""))
                                 println(tokenResponse)
                                 storeTokens(tokenResponse.access_token, tokenResponse.refresh_token)
                                 toHub()
                             } catch (exception: UnauthorizedException) {
                                 val error = exception.response?.body<ErrorResponse>()
-                                showSnackbar(error?.message ?: "")
+                                showSnackbar(error?.message ?: "Unauthorized Exception")
+                            } catch (exception: BadRequestException) {
+                                val error = exception.response?.body<ErrorResponse>()
+                                showSnackbar(error?.message ?: "Bad Request Exception")
                             }
                             //todo add more exceptions
                         } },

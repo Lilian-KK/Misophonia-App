@@ -16,7 +16,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.moravian.csci215.misophoniaapp.screens.login.FilledTextField
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
 import misophoniaapp.composeapp.generated.resources.back_arrow
@@ -35,7 +34,7 @@ data object CreateAccount
 fun CreateAccountScreen(
     showSnackbar: (String) -> Unit,
     goBack: () -> Unit,
-    sendCode: suspend (String) -> Unit,
+    sendCode: (String) -> Unit,
     toVerifyPhoneNumber: (String, String, String) -> Unit
 ) {
     var username by remember { mutableStateOf("") }
@@ -103,18 +102,14 @@ fun CreateAccountScreen(
 
         Button(
             onClick = {
-                coroutineScope.launch {
-                    sendCode(phoneNumber)
-                }
+                sendCode(phoneNumber)
                 toVerifyPhoneNumber(phoneNumber, username, password)
                       },
-            modifier =
-                Modifier
+            modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
             shape = RoundedCornerShape(100.dp),
-            colors =
-                ButtonDefaults.buttonColors(
+            colors = ButtonDefaults.buttonColors(
                     containerColor = primaryColor,
                     contentColor = Color.White,
                 ),
