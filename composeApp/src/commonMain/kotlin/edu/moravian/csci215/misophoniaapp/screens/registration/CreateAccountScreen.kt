@@ -1,5 +1,8 @@
 package edu.moravian.csci215.misophoniaapp.screens.registration
 
+import BadRequestException
+import ConflictException
+import ErrorResponse
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -16,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.moravian.csci215.misophoniaapp.screens.login.FilledTextField
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
 import misophoniaapp.composeapp.generated.resources.back_arrow
@@ -34,7 +38,7 @@ data object CreateAccount
 fun CreateAccountScreen(
     showSnackbar: (String) -> Unit,
     goBack: () -> Unit,
-    sendCode: (String) -> Unit,
+    sendCode: suspend (String) -> Unit,
     toVerifyPhoneNumber: (String, String, String) -> Unit
 ) {
     var username by remember { mutableStateOf("") }
@@ -102,8 +106,20 @@ fun CreateAccountScreen(
 
         Button(
             onClick = {
-                sendCode(phoneNumber)
-                toVerifyPhoneNumber(phoneNumber, username, password)
+                coroutineScope.launch {
+                    try {
+                        sendCode(phoneNumber.formatPhone())
+                        toVerifyPhoneNumber(phoneNumber.formatPhone(), username, password)
+                    } catch (exception: BadRequestException) {
+                        showSnackbar(exception.message ?: "Bad Request Exception")
+                        println("exception: " + exception)
+                        println("message: " + exception.message)
+                        println("response: " + exception.response)
+                        println("status: " + exception.status)
+                    } catch (exception: ConflictException) { //409--that username is already taken
+                        showSnackbar(exception.message ?: "Conflict Exception")
+                    }
+                }
                       },
             modifier = Modifier
                     .fillMaxWidth()
@@ -124,4 +140,11 @@ fun CreateAccountScreen(
             )
         }
     }
+}
+
+
+fun String.formatPhone(): String {
+    if (!this.startsWith("+1")) {
+        return "+1$this"
+    } else return this
 }

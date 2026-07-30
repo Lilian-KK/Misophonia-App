@@ -1,6 +1,10 @@
 package edu.moravian.csci215.misophoniaapp.screens
 
+import BadRequestException
 import ErrorResponse
+import ForbiddenException
+import NotFoundException
+import TooManyRequestsException
 import UnauthorizedException
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import edu.moravian.csci215.misophoniaapp.screens.login.FilledTextField
 import io.ktor.client.call.body
+import io.ktor.client.plugins.ClientRequestException
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
@@ -26,12 +31,12 @@ data object AppSettings
 
 @Composable
 fun AppSettingsScreen(
-    clearTokens: () -> Unit,
-    logOut: () -> Unit,
-    changePassword: (String, String) -> Unit,
-    changePhoneNumber: (String, String) -> Unit,
-    toSetup: () -> Unit,
     showSnackbar: (String) -> Unit,
+    clearTokens: suspend () -> Unit,
+    logOut: suspend () -> Unit,
+    changePassword: suspend (String, String) -> Unit,
+    changePhoneNumber: suspend (String, String) -> Unit,
+    toSetup: () -> Unit,
     ) {
     val coroutineScope = rememberCoroutineScope()
 
@@ -50,16 +55,17 @@ fun AppSettingsScreen(
 
         //logout button
         Button(onClick = {
-            try {
-                logOut()
-            } catch (exception: UnauthorizedException) {
-                coroutineScope.launch {
-                    val error = exception.response?.body<ErrorResponse>()
-                    showSnackbar(error?.message ?: "")
+            coroutineScope.launch {
+                try {
+                    logOut()
+                    clearTokens()
+                    toSetup()
+                } catch (exception: UnauthorizedException) { //401
+                    showSnackbar(exception.message ?: "UnauthorizedException")
+                } catch (exception: BadRequestException) { //400
+                    showSnackbar(exception.message ?: "BadRequestException")
                 }
             }
-            clearTokens()
-            toSetup()
         }) {
             Text("Log out")
         }
@@ -86,7 +92,21 @@ fun AppSettingsScreen(
             if (!changingPassword) {
                 changingPassword = true
             } else {
-                changePassword(currentPassword, newPassword)
+                coroutineScope.launch {
+                    try {
+                        changePassword(currentPassword, newPassword)
+                    } catch (exception: BadRequestException) {
+                        showSnackbar(exception.message ?: "BadRequestException")
+                    } catch (exception: UnauthorizedException) {
+                        showSnackbar(exception.message ?: "UnauthorizedException")
+                    } catch (exception: ForbiddenException) { //403--current password field is incorrect
+                        showSnackbar(exception.message ?: "ForbiddenException")
+                    } catch (exception: NotFoundException) { //404--user not found
+                        showSnackbar(exception.message ?: "Not Found Exception")
+                    } catch (exception: TooManyRequestsException) { //429--exceeded rate limitations
+                        showSnackbar(exception.message ?: "Too Many Requests Exception")
+                    }
+                }
                 changingPassword = false
             }
         }

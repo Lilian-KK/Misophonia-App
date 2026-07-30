@@ -2,6 +2,8 @@ package edu.moravian.csci215.misophoniaapp.screens.login
 
 import BadRequestException
 import ErrorResponse
+import ForbiddenException
+import TooManyRequestsException
 import UnauthorizedException
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,9 +48,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.moravian.csci215.misophoniaapp.server_data.LoginResponse
-import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.ServerResponseException
+import io.ktor.client.plugins.ClientRequestException
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
@@ -56,13 +57,10 @@ import misophoniaapp.composeapp.generated.resources.back_arrow
 import misophoniaapp.composeapp.generated.resources.continue_
 import misophoniaapp.composeapp.generated.resources.didnt_get_code
 import misophoniaapp.composeapp.generated.resources.enter_code
-import misophoniaapp.composeapp.generated.resources.forgot_password
 import misophoniaapp.composeapp.generated.resources.go_back
-import misophoniaapp.composeapp.generated.resources.phone_number
 import misophoniaapp.composeapp.generated.resources.send_another_code
 import misophoniaapp.composeapp.generated.resources.send_code
 import misophoniaapp.composeapp.generated.resources.username
-import misophoniaapp.composeapp.generated.resources.verify_for_pw_creation
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -78,7 +76,7 @@ fun CodeLoginScreen(
     storeTokens: suspend (String, String) -> Unit,
     showSnackbar: (String) -> Unit,
     toHub: () -> Unit = {},
-    sendCode: (String) -> Unit,
+    sendCode: suspend (String) -> Unit,
     onLogin: suspend (String, String, String) -> LoginResponse
 ) {
     var codeSent by remember { mutableStateOf(false) }
@@ -149,14 +147,16 @@ fun CodeLoginScreen(
             item {
                 Button(
                     onClick = {
+                        coroutineScope.launch {
                         try {
                             sendCode(username)
                             codeSent = true
-                        } catch (exception: ServerResponseException) {
-                            coroutineScope.launch {
-                                val error = exception.response?.body<ErrorResponse>()
-                                showSnackbar(error?.message ?: "")
-                            }
+                        } catch (exception: BadRequestException) { //400
+                            showSnackbar(exception.message ?: "BadRequestException")
+                        } catch (exception: ForbiddenException) { //403--code could not be delivered
+                            showSnackbar(exception.message ?: "ForbiddenException")
+                        } catch (exception: TooManyRequestsException) { //429--exceeded rate limit
+                            showSnackbar(exception.message ?: "Too Many Requests Exception") }
                         } },
                     modifier =
                         Modifier
@@ -253,7 +253,20 @@ fun CodeLoginScreen(
                         letterSpacing = 0.25.sp,
                         color = Color.Black,
                         textDecoration = TextDecoration.Underline,
-                        modifier = Modifier.clickable { },
+                        modifier = Modifier.clickable ( onClick = {
+                            coroutineScope.launch {
+                                try {
+                                    sendCode(username)
+                                } catch (exception: BadRequestException) {
+                                    showSnackbar(exception.message ?: "BadRequest Exception")
+                                } catch (exception: ForbiddenException) {
+                                    showSnackbar(exception.message ?: "Forbidden Exception")
+                                } catch (exception: TooManyRequestsException) { //429--exceeded rate limitations
+                                    showSnackbar(exception.message ?: "Too Many Requests Exception")
+                                }
+                            }
+                        }
+                        ),
                     )
                 }
             }
@@ -265,21 +278,21 @@ fun CodeLoginScreen(
             item {
                 Button(
                     onClick = {
-                        toHub()
                         coroutineScope.launch {
                             try {
                                 val tokenResponse = onLogin(username, "code", code.joinToString(""))
                                 println(tokenResponse)
                                 storeTokens(tokenResponse.access_token, tokenResponse.refresh_token)
                                 toHub()
-                            } catch (exception: UnauthorizedException) {
-                                val error = exception.response?.body<ErrorResponse>()
-                                showSnackbar(error?.message ?: "Unauthorized Exception")
-                            } catch (exception: BadRequestException) {
-                                val error = exception.response?.body<ErrorResponse>()
-                                showSnackbar(error?.message ?: "Bad Request Exception")
+                            } catch (exception: UnauthorizedException) { //401--invalid username
+                                showSnackbar(exception.message ?: "Unauthorized Exception")
+                            } catch (exception: BadRequestException) { //400
+                                showSnackbar(exception.message ?: "Bad Request Exception")
+                            } catch (exception: ForbiddenException) { //403--invalid text code
+                                showSnackbar(exception.message ?: "Forbidden Exception")
+                            } catch (exception: TooManyRequestsException) { //429--exceeded rate limitations
+                                showSnackbar(exception?.message ?: "Too Many Requests Exception")
                             }
-                            //todo add more exceptions
                         } },
                     modifier =
                         Modifier

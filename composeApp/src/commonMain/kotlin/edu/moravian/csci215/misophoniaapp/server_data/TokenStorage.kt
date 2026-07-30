@@ -35,5 +35,16 @@ object TokenStorage {
         }
     }
 
+    suspend fun loadTokens(): BearerTokens? {
+        val accessToken = accessToken.first()
+        val refreshToken = refreshToken.first()
+
+        return if (accessToken != null && refreshToken != null) {
+            BearerTokens(accessToken, refreshToken)
+        } else {
+            null
+        }
+    }
+
 }
 
