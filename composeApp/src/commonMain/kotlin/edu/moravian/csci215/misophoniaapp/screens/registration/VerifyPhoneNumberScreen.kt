@@ -1,6 +1,7 @@
 package edu.moravian.csci215.misophoniaapp.screens.registration
 
 import BadRequestException
+import ConflictException
 import ErrorResponse
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import edu.moravian.csci215.misophoniaapp.screens.login.CodeChip
 import edu.moravian.csci215.misophoniaapp.server_data.UserResponse
 import io.ktor.client.call.body
+import io.ktor.client.plugins.ClientRequestException
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
@@ -49,7 +51,7 @@ fun VerifyPhoneNumberScreen(
     showSnackbar: (String) -> Unit,
     goBack: () -> Unit,
     toHub: () -> Unit,
-    sendCode: suspend (String) -> Unit, //todo add a resend code button like codelogin has
+    sendCode: suspend (String) -> Unit, //todo: add a resend code button like codelogin has
     createAccount: suspend (String) -> UserResponse,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -92,15 +94,14 @@ fun VerifyPhoneNumberScreen(
 
         Button(
             onClick = {
-                try {
-                    coroutineScope.launch {
+                coroutineScope.launch {
+                    try {
                         createAccount(code.joinToString(""))
-                    }
-                    toHub()
-                } catch (exception: BadRequestException) {
-                    coroutineScope.launch {
-                        val error = exception.response?.body<ErrorResponse>()
-                        showSnackbar(error?.message ?: "Bad Request Exception")
+                        toHub()
+                    } catch (exception: BadRequestException) {
+                        showSnackbar(exception.message ?: "Bad Request Exception")
+                    } catch (exception: ConflictException) {
+                        showSnackbar(exception.message ?: "Conflict Exception")
                     }
                 }
             }

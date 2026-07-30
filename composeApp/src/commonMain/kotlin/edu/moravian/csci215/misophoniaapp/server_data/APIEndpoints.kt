@@ -76,6 +76,7 @@ suspend fun sendLoginCode(
 ) {
     client.post("auth/send") {
         contentType(ContentType.Application.Json)
+        println(username)
         setBody(
             PhoneAuthPayload(
                 username = username
@@ -106,7 +107,7 @@ suspend fun refresh(
                 refresh_token = refreshToken
             )
         )
-    }.body()
+    }.body() //this one will need to catch 400, 401 (invalid refresh token), and 429 (toomanyrequests)
 
 suspend fun changePassword(
     client: HttpClient,
@@ -142,7 +143,7 @@ suspend fun resetPassword(
             )
         )
     }
-}
+} //catches 400, 403, 429
 
 suspend fun changePhoneNumber(
     client: HttpClient,
@@ -156,4 +157,4 @@ suspend fun changePhoneNumber(
                 code = code
             )
         )
-    }.body()
+    }.body() //catches 400, 401, 403, 404

@@ -1,10 +1,7 @@
 package edu.moravian.csci215.misophoniaapp.server_data
 
-import io.ktor.client.plugins.auth.providers.BearerTokens
-import kotlinx.coroutines.flow.first
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
 
 @Serializable
 data class UserCreate (
@@ -87,22 +84,3 @@ data class ChangePhoneRequest(
 data class ChangePhoneResponse(
     val phone_number: String
 )
-
-fun saveNewTokens() {
-
-}
-
-suspend fun loadTokens(tokenStorage: TokenStorage): BearerTokens? {
-    val accessToken = tokenStorage.accessToken.first()
-    val refreshToken = tokenStorage.refreshToken.first()
-
-    return if (accessToken != null && refreshToken != null) {
-        BearerTokens(accessToken, refreshToken)
-    } else {
-        null
-    }
-}
-
-suspend fun refreshTokens(tokenStorage: TokenStorage) {
-
-}

@@ -1,6 +1,9 @@
 package edu.moravian.csci215.misophoniaapp.screens.login
 
+import BadRequestException
 import ErrorResponse
+import ForbiddenException
+import TooManyRequestsException
 import UnauthorizedException
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.moravian.csci215.misophoniaapp.server_data.LoginResponse
 import io.ktor.client.call.body
+import io.ktor.client.plugins.ClientRequestException
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
@@ -42,7 +46,6 @@ import misophoniaapp.composeapp.generated.resources.back_arrow
 import misophoniaapp.composeapp.generated.resources.go_back
 import misophoniaapp.composeapp.generated.resources.login
 import misophoniaapp.composeapp.generated.resources.password
-import misophoniaapp.composeapp.generated.resources.phone_number
 import misophoniaapp.composeapp.generated.resources.username
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -56,7 +59,7 @@ data class PasswordLogin(
 fun PasswordLoginScreen(
     username: String,
     goBack: () -> Unit,
-    storeTokens: (String, String) -> Unit,
+    storeTokens: suspend (String, String) -> Unit,
     showSnackbar: (String) -> Unit,
     toHub: () -> Unit,
     onLogin: suspend (String, String, String) -> LoginResponse,
@@ -121,11 +124,13 @@ fun PasswordLoginScreen(
                            println(tokenResponse)
                            storeTokens(tokenResponse.access_token, tokenResponse.refresh_token)
                            toHub()
-                       } catch (exception: UnauthorizedException) {
-                           val error = exception.response?.body<ErrorResponse>()
-                           showSnackbar(error?.message ?: "")
+                       } catch (exception: UnauthorizedException) { //401
+                           showSnackbar(exception.message ?: "UnauthorizedException")
+                       } catch (exception: BadRequestException) { //400
+                           showSnackbar(exception.message ?: "BadRequestException")
+                       } catch (exception: TooManyRequestsException) { //429--exceeded rate limitations
+                           showSnackbar(exception.message ?: "Too Many Requests Exception")
                        }
-                       //todo add more exceptions
                    } },
                modifier = Modifier
                    .fillMaxWidth()
