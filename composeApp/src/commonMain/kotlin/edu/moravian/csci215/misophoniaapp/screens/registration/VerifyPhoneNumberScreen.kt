@@ -2,17 +2,32 @@ package edu.moravian.csci215.misophoniaapp.screens.registration
 
 import BadRequestException
 import ConflictException
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import ErrorResponse
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import edu.moravian.csci215.misophoniaapp.screens.login.CodeChip
 import edu.moravian.csci215.misophoniaapp.server_data.UserResponse
+import io.ktor.client.call.body
+import io.ktor.client.plugins.ClientRequestException
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
@@ -52,18 +67,18 @@ fun VerifyPhoneNumberScreen(
         ) {
             repeat(6) { index ->
                 if (index > 0) Spacer(modifier = Modifier.width(8.dp))
-                CodeChip(
-                    value = code[index],
-                    focusRequester = focusRequesters[index],
-                    onValueChange = { newValue ->
-                        if (newValue.length <= 1 && (newValue.isEmpty() || newValue.all { it.isDigit() })) {
-                            code = code.toMutableList().apply { this[index] = newValue }
-                            if (newValue.isNotEmpty() && index < 5) {
-                                focusRequesters[index + 1].requestFocus()
-                            }
-                        }
-                    },
-                )
+//                CodeChip(
+//                    value = code[index],
+//                    focusRequester = focusRequesters[index],
+//                    onValueChange = { newValue ->
+//                        if (newValue.length <= 1 && (newValue.isEmpty() || newValue.all { it.isDigit() })) {
+//                            code = code.toMutableList().apply { this[index] = newValue }
+//                            if (newValue.isNotEmpty() && index < 5) {
+//                                focusRequesters[index + 1].requestFocus()
+//                            }
+//                        }
+//                    },
+//                )
             }
         }
 
@@ -83,9 +98,9 @@ fun VerifyPhoneNumberScreen(
                         createAccount(code.joinToString(""))
                         toHub()
                     } catch (exception: BadRequestException) {
-                        showSnackbar(exception.message?.substringAfter("400: ") ?: "Bad Request Exception")
+                        showSnackbar(exception.message ?: "Bad Request Exception")
                     } catch (exception: ConflictException) {
-                        showSnackbar(exception.message?.substringAfter("409: ") ?: "Conflict Exception")
+                        showSnackbar(exception.message ?: "Conflict Exception")
                     }
                 }
             }
@@ -93,4 +108,16 @@ fun VerifyPhoneNumberScreen(
             Text("continue to hub")
         }
     }
+
+//    onClick = {
+//        coroutineScope.launch {
+//            try {
+//                //todo add code setup
+//                onCreateAccount(phoneNumber, username, "code", password)
+//                toHub()
+//            } catch (exception: ConflictException) {
+//                val error = exception.response?.body<ErrorResponse>()
+//                showSnackbar(error?.message ?: "")
+//            }
+//        }
 }

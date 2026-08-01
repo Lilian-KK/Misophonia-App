@@ -232,7 +232,7 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
                         toForgotPassword = { username: String -> navController.navigate(ForgotPassword(username)) },
                         onLogin = { username: String, login_method: String, login_value: String ->
                             logIn(httpClient, username, login_method, login_value)
-                        },
+                        }
                     )
                 }
                 composable<ForgotPassword> { navBackStackEntry ->

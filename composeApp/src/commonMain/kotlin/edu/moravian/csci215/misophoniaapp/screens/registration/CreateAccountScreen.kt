@@ -18,7 +18,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import edu.moravian.csci215.misophoniaapp.screens.login.FilledTextField
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
@@ -71,26 +70,26 @@ fun CreateAccountScreen(
                     .padding(bottom = 32.dp),
         )
         Column(verticalArrangement = Arrangement.spacedBy(32.dp)) {
-            FilledTextField(
-                value = username,
-                onValueChange = { username = it },
-                label = stringResource(Res.string.username),
-            )
-
-            FilledTextField(
-                value = phoneNumber,
-                onValueChange = { phoneNumber = it },
-                label = stringResource(Res.string.phone_number),
-                keyboardType = KeyboardType.Phone
-            )
-
-            FilledTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = stringResource(Res.string.password),
-                keyboardType = KeyboardType.Password,
-                isPassword = true
-            )
+//            FilledTextField(
+//                value = username,
+//                onValueChange = { username = it },
+//                label = stringResource(Res.string.username),
+//            )
+//
+//            FilledTextField(
+//                value = phoneNumber,
+//                onValueChange = { phoneNumber = it },
+//                label = stringResource(Res.string.phone_number),
+//                keyboardType = KeyboardType.Phone
+//            )
+//
+//            FilledTextField(
+//                value = password,
+//                onValueChange = { password = it },
+//                label = stringResource(Res.string.password),
+//                keyboardType = KeyboardType.Password,
+//                isPassword = true
+//            )
         }
 
         IconButton(onClick = goBack, modifier = Modifier.size(48.dp)) {
@@ -111,9 +110,13 @@ fun CreateAccountScreen(
                         sendCode(phoneNumber.formatPhone())
                         toVerifyPhoneNumber(phoneNumber.formatPhone(), username, password)
                     } catch (exception: BadRequestException) {
-                        showSnackbar(exception.message?.substringAfter("400: ") ?: "Bad Request Exception")
+                        showSnackbar(exception.message ?: "Bad Request Exception")
+                        println("exception: " + exception)
+                        println("message: " + exception.message)
+                        println("response: " + exception.response)
+                        println("status: " + exception.status)
                     } catch (exception: ConflictException) { //409--that username is already taken
-                        showSnackbar(exception.message?.substringAfter("409: ") ?: "Conflict Exception")
+                        showSnackbar(exception.message ?: "Conflict Exception")
                     }
                 }
                       },

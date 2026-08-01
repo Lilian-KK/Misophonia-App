@@ -20,7 +20,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import edu.moravian.csci215.misophoniaapp.screens.login.FilledTextField
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
 import kotlinx.coroutines.launch
@@ -61,9 +60,9 @@ fun AppSettingsScreen(
                     clearTokens()
                     toSetup()
                 } catch (exception: UnauthorizedException) { //401
-                    showSnackbar(exception.message?.substringAfter("401: ") ?: "UnauthorizedException")
+                    showSnackbar(exception.message ?: "UnauthorizedException")
                 } catch (exception: BadRequestException) { //400
-                    showSnackbar(exception.message?.substringAfter("400: ") ?: "BadRequestException")
+                    showSnackbar(exception.message ?: "BadRequestException")
                 }
             }
         }) {
@@ -71,21 +70,21 @@ fun AppSettingsScreen(
         }
 
         //change password input fields
-        if (changingPassword) {
-            FilledTextField(
-                value = currentPassword,
-                onValueChange = { currentPassword = it },
-                label = "Current Password",
-                isPassword = true
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            FilledTextField(
-                value = newPassword,
-                onValueChange = { newPassword = it },
-                label = "New Password",
-                isPassword = true
-            )
-        }
+//        if (changingPassword) {
+//            FilledTextField(
+//                value = currentPassword,
+//                onValueChange = { currentPassword = it },
+//                label = "Current Password",
+//                isPassword = true
+//            )
+//            Spacer(modifier = Modifier.height(24.dp))
+//            FilledTextField(
+//                value = newPassword,
+//                onValueChange = { newPassword = it },
+//                label = "New Password",
+//                isPassword = true
+//            )
+//        }
 
         //changing password button
         Button(onClick = {
@@ -96,15 +95,15 @@ fun AppSettingsScreen(
                     try {
                         changePassword(currentPassword, newPassword)
                     } catch (exception: BadRequestException) {
-                        showSnackbar(exception.message?.substringAfter("400: ") ?: "BadRequestException")
+                        showSnackbar(exception.message ?: "BadRequestException")
                     } catch (exception: UnauthorizedException) {
-                        showSnackbar(exception.message?.substringAfter("401: ") ?: "UnauthorizedException")
+                        showSnackbar(exception.message ?: "UnauthorizedException")
                     } catch (exception: ForbiddenException) { //403--current password field is incorrect
-                        showSnackbar(exception.message?.substringAfter("403: ") ?: "ForbiddenException")
+                        showSnackbar(exception.message ?: "ForbiddenException")
                     } catch (exception: NotFoundException) { //404--user not found
-                        showSnackbar(exception.message?.substringAfter("404: ") ?: "Not Found Exception")
+                        showSnackbar(exception.message ?: "Not Found Exception")
                     } catch (exception: TooManyRequestsException) { //429--exceeded rate limitations
-                        showSnackbar(exception.message?.substringAfter("429: ") ?: "Too Many Requests Exception")
+                        showSnackbar(exception.message ?: "Too Many Requests Exception")
                     }
                 }
                 changingPassword = false
