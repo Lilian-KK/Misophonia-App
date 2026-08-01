@@ -6,47 +6,35 @@ import ForbiddenException
 import TooManyRequestsException
 import UnauthorizedException
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import edu.moravian.csci215.misophoniaapp.AppColors
+import edu.moravian.csci215.misophoniaapp.CodeEntryPrompt
+import edu.moravian.csci215.misophoniaapp.FilledTextField
+import edu.moravian.csci215.misophoniaapp.OtpCodeInput
+import edu.moravian.csci215.misophoniaapp.PrimaryButton
+import edu.moravian.csci215.misophoniaapp.ResendCodeRow
+import edu.moravian.csci215.misophoniaapp.ScreenTitle
+import edu.moravian.csci215.misophoniaapp.fredokaFontFamily
 import edu.moravian.csci215.misophoniaapp.server_data.LoginResponse
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
@@ -55,10 +43,8 @@ import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
 import misophoniaapp.composeapp.generated.resources.back_arrow
 import misophoniaapp.composeapp.generated.resources.continue_
-import misophoniaapp.composeapp.generated.resources.didnt_get_code
-import misophoniaapp.composeapp.generated.resources.enter_code
 import misophoniaapp.composeapp.generated.resources.go_back
-import misophoniaapp.composeapp.generated.resources.send_another_code
+import misophoniaapp.composeapp.generated.resources.login
 import misophoniaapp.composeapp.generated.resources.send_code
 import misophoniaapp.composeapp.generated.resources.username
 import org.jetbrains.compose.resources.painterResource
@@ -80,207 +66,110 @@ fun CodeLoginScreen(
     onLogin: suspend (String, String, String) -> LoginResponse
 ) {
     var codeSent by remember { mutableStateOf(false) }
-    var code by remember { mutableStateOf(listOf("", "", "", "", "", "")) }
-    val focusRequesters = remember { List(6) { FocusRequester() } }
+    var code by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
+    val fredoka = fredokaFontFamily()
 
-    LazyColumn(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(Color.White)
-                .padding(horizontal = 16.dp, vertical = 52.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColors.Background),
     ) {
-        item {
-            Text(
-                //text = stringResource(Res.string.forgot_password),
-                text = "Code Login",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Normal,
-                lineHeight = 36.sp,
-                textAlign = TextAlign.Center,
-                color = Color.Black,
-                modifier = Modifier.fillMaxWidth(),
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
+        ) {
+            Spacer(modifier = Modifier.height(48.dp))
+
+            ScreenTitle(
+                text = stringResource(Res.string.login),
+                modifier = Modifier.fillMaxWidth()
             )
-        }
 
-        item {
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-
-        item {
-            Text(
-                text = "Please click the button and enter the 6-digit code that was sent to your phone.",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Normal,
-                lineHeight = 20.sp,
-                letterSpacing = 0.25.sp,
-                textAlign = TextAlign.Center,
-                color = Color.Black,
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(32.dp))
-        }
-
-        item {
             FilledTextField(
                 value = username,
                 label = stringResource(Res.string.username),
-                keyboardType = KeyboardType.Text
+                keyboardType = KeyboardType.Text,
+                fontFamily = fredoka,
             )
-        }
 
-        item {
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-
-
-        if (!codeSent) {
-            item {
-                Spacer(modifier = Modifier.height(32.dp))
-            }
-
-            item {
-                Button(
+            if (!codeSent) {
+                PrimaryButton(
+                    text = stringResource(Res.string.send_code),
+                    fontFamily = fredoka,
                     onClick = {
                         coroutineScope.launch {
-                        try {
-                            sendCode(username)
-                            codeSent = true
-                        } catch (exception: BadRequestException) { //400
-                            showSnackbar(exception.message ?: "BadRequestException")
-                        } catch (exception: ForbiddenException) { //403--code could not be delivered
-                            showSnackbar(exception.message ?: "ForbiddenException")
-                        } catch (exception: TooManyRequestsException) { //429--exceeded rate limit
-                            showSnackbar(exception.message ?: "Too Many Requests Exception") }
-                        } },
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                    shape = RoundedCornerShape(100.dp),
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF6750A4),
-                            contentColor = Color.White,
-                        ),
-                ) {
-                    Text(
-                        text = stringResource(Res.string.send_code),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        lineHeight = 24.sp,
-                        letterSpacing = 0.15.sp,
-                    )
-                }
+                            try {
+                                sendCode(username)
+                                codeSent = true
+                            } catch (exception: BadRequestException) { //400
+                                showSnackbar(exception.message ?: "BadRequestException")
+                            } catch (exception: ForbiddenException) { //403--code could not be delivered
+                                showSnackbar(exception.message ?: "ForbiddenException")
+                            } catch (exception: TooManyRequestsException) { //429--exceeded rate limit
+                                showSnackbar(exception.message ?: "Too Many Requests Exception")
+                            }
+                        }
+                    },
+                )
+            }
+
+            if (codeSent) {
+                CodeEntryPrompt(fontFamily = fredoka)
+
+                OtpCodeInput(
+                    fontFamily = fredoka,
+                    onCodeChange = { code = it },
+                )
+
+                ResendCodeRow(
+                    fontFamily = fredoka,
+                    onResendClick = {
+                        coroutineScope.launch {
+                            try {
+                                sendCode(username)
+                                showSnackbar("A new code was sent to your phone number")
+                            } catch (exception: BadRequestException) {
+                                showSnackbar(exception.message ?: "BadRequest Exception")
+                            } catch (exception: ForbiddenException) {
+                                showSnackbar(exception.message ?: "Forbidden Exception")
+                            } catch (exception: TooManyRequestsException) { //429--exceeded rate limitations
+                                showSnackbar(exception.message ?: "Too Many Requests Exception")
+                            }
+                        }
+                    },
+                )
             }
         }
 
         if (codeSent) {
-            item {
-                Spacer(modifier = Modifier.height(32.dp))
-            }
+            Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+                IconButton(
+                    onClick = goBack,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(AppColors.Button, CircleShape)
+                ) {
+                    Icon(
+                        painter = painterResource(Res.drawable.back_arrow),
+                        contentDescription = stringResource(Res.string.go_back),
+                        modifier = Modifier.size(24.dp),
+                        tint = Color.White
+                    )
+                }
 
-            item {
-                Text(
-                    text = stringResource(Res.string.enter_code),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    lineHeight = 20.sp,
-                    letterSpacing = 0.25.sp,
-                    textAlign = TextAlign.Center,
-                    color = Color.Black,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-
-            item {
                 Spacer(modifier = Modifier.height(16.dp))
-            }
 
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    repeat(6) { index ->
-                        if (index > 0) Spacer(modifier = Modifier.width(8.dp))
-                        CodeChip(
-                            value = code[index],
-                            focusRequester = focusRequesters[index],
-                            onValueChange = { newValue ->
-                                if (newValue.length <= 1 && (newValue.isEmpty() || newValue.all { it.isDigit() })) {
-                                    code = code.toMutableList().apply { this[index] = newValue }
-                                    if (newValue.isNotEmpty() && index < 5) {
-                                        focusRequesters[index + 1].requestFocus()
-                                    }
-                                }
-                            },
-                        )
-                    }
-                }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-
-            item {
-                Row(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 32.dp),
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    Text(
-                        text = stringResource(Res.string.didnt_get_code),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Normal,
-                        lineHeight = 20.sp,
-                        letterSpacing = 0.25.sp,
-                        color = Color.Black,
-                    )
-                    Text(
-                        text = stringResource(Res.string.send_another_code),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Normal,
-                        lineHeight = 20.sp,
-                        letterSpacing = 0.25.sp,
-                        color = Color.Black,
-                        textDecoration = TextDecoration.Underline,
-                        modifier = Modifier.clickable ( onClick = {
-                            coroutineScope.launch {
-                                try {
-                                    sendCode(username)
-                                } catch (exception: BadRequestException) {
-                                    showSnackbar(exception.message ?: "BadRequest Exception")
-                                } catch (exception: ForbiddenException) {
-                                    showSnackbar(exception.message ?: "Forbidden Exception")
-                                } catch (exception: TooManyRequestsException) { //429--exceeded rate limitations
-                                    showSnackbar(exception.message ?: "Too Many Requests Exception")
-                                }
-                            }
-                        }
-                        ),
-                    )
-                }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(32.dp))
-            }
-
-            item {
-                Button(
+                PrimaryButton(
+                    text = stringResource(Res.string.login),
+                    fontFamily = fredoka,
                     onClick = {
                         coroutineScope.launch {
                             try {
-                                val tokenResponse = onLogin(username, "code", code.joinToString(""))
+                                val tokenResponse = onLogin(username, "code", code)
                                 println(tokenResponse)
                                 storeTokens(tokenResponse.access_token, tokenResponse.refresh_token)
                                 toHub()
@@ -291,86 +180,30 @@ fun CodeLoginScreen(
                             } catch (exception: ForbiddenException) { //403--invalid text code
                                 showSnackbar(exception.message ?: "Forbidden Exception")
                             } catch (exception: TooManyRequestsException) { //429--exceeded rate limitations
-                                showSnackbar(exception?.message ?: "Too Many Requests Exception")
+                                showSnackbar(exception.message ?: "Too Many Requests Exception")
                             }
-                        } },
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                    shape = RoundedCornerShape(100.dp),
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF6750A4),
-                            contentColor = Color.White,
-                        ),
+                        }
+                    },
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+        } else {
+            Column(modifier = Modifier.padding(24.dp)) {
+                IconButton(
+                    onClick = goBack,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(AppColors.Button, CircleShape)
                 ) {
-                    Text(
-                        text = stringResource(Res.string.continue_),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        lineHeight = 24.sp,
-                        letterSpacing = 0.15.sp,
+                    Icon(
+                        painter = painterResource(Res.drawable.back_arrow),
+                        contentDescription = stringResource(Res.string.go_back),
+                        modifier = Modifier.size(24.dp),
+                        tint = Color.White
                     )
                 }
             }
         }
     }
-    IconButton(onClick = goBack, modifier = Modifier.size(48.dp)) {
-        Icon(
-            painter = painterResource(Res.drawable.back_arrow),
-            contentDescription = stringResource(Res.string.go_back),
-            modifier = Modifier.size(24.dp),
-            tint = Color.DarkGray
-        )
-    }
 }
-
-@Composable
-fun CodeChip(
-    value: String,
-    focusRequester: FocusRequester,
-    onValueChange: (String) -> Unit,
-) {
-    var isFocused by remember { mutableStateOf(false) }
-    val borderColor = if (isFocused) Color(0xFF6750A4) else Color(0xFFCAC4D0)
-
-    Box(
-        modifier =
-            Modifier
-                .width(42.dp)
-                .height(56.dp)
-                .border(
-                    width = 1.dp,
-                    color = borderColor,
-                    shape = RoundedCornerShape(8.dp),
-                ).background(Color.White, RoundedCornerShape(8.dp)),
-        contentAlignment = Alignment.Center,
-    ) {
-        BasicTextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .focusRequester(focusRequester)
-                    .onFocusChanged { isFocused = it.isFocused },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            cursorBrush = SolidColor(Color(0xFF6750A4)),
-            textStyle =
-                TextStyle(
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center,
-                    color = Color(0xFF49454F),
-                ),
-            decorationBox = { innerTextField ->
-                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                    innerTextField()
-                }
-            },
-        )
-    }
-}
-

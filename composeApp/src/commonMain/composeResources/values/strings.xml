@@ -28,7 +28,7 @@
     <!-- nora/lili note: the newer strings are below -->
 
     <!--SetupScreen-->
-    <string name="welcome_message">Welcome to Tranquilify</string>
+    <string name="welcome_message">Welcome to\nTranquilify</string>
     <string name="login">Log In</string>
     <string name="create_account">Create an Account</string>
 
