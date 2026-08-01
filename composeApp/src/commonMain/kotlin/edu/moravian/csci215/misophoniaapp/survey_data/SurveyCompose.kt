@@ -1,42 +1,19 @@
 package edu.moravian.csci215.misophoniaapp.survey_data
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.ToggleButton
-import androidx.compose.material3.ToggleButtonShapes
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.ktor.client.request.invoke
 import misophoniaapp.composeapp.generated.resources.Res
-import misophoniaapp.composeapp.generated.resources.checkmark
 import misophoniaapp.composeapp.generated.resources.other
-import misophoniaapp.composeapp.generated.resources.uncheckmark
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import kotlin.math.roundToInt
 
 /**
  * Renders a list of [SurveyElement]s as a scrollable column. Each element is rendered using the

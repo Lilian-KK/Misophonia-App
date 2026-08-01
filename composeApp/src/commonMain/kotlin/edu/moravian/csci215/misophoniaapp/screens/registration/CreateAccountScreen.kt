@@ -111,13 +111,9 @@ fun CreateAccountScreen(
                         sendCode(phoneNumber.formatPhone())
                         toVerifyPhoneNumber(phoneNumber.formatPhone(), username, password)
                     } catch (exception: BadRequestException) {
-                        showSnackbar(exception.message ?: "Bad Request Exception")
-                        println("exception: " + exception)
-                        println("message: " + exception.message)
-                        println("response: " + exception.response)
-                        println("status: " + exception.status)
+                        showSnackbar(exception.message?.substringAfter("400: ") ?: "Bad Request Exception")
                     } catch (exception: ConflictException) { //409--that username is already taken
-                        showSnackbar(exception.message ?: "Conflict Exception")
+                        showSnackbar(exception.message?.substringAfter("409: ") ?: "Conflict Exception")
                     }
                 }
                       },

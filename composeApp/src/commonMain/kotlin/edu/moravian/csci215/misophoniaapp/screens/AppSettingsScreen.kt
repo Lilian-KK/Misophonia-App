@@ -61,9 +61,9 @@ fun AppSettingsScreen(
                     clearTokens()
                     toSetup()
                 } catch (exception: UnauthorizedException) { //401
-                    showSnackbar(exception.message ?: "UnauthorizedException")
+                    showSnackbar(exception.message?.substringAfter("401: ") ?: "UnauthorizedException")
                 } catch (exception: BadRequestException) { //400
-                    showSnackbar(exception.message ?: "BadRequestException")
+                    showSnackbar(exception.message?.substringAfter("400: ") ?: "BadRequestException")
                 }
             }
         }) {
@@ -96,15 +96,15 @@ fun AppSettingsScreen(
                     try {
                         changePassword(currentPassword, newPassword)
                     } catch (exception: BadRequestException) {
-                        showSnackbar(exception.message ?: "BadRequestException")
+                        showSnackbar(exception.message?.substringAfter("400: ") ?: "BadRequestException")
                     } catch (exception: UnauthorizedException) {
-                        showSnackbar(exception.message ?: "UnauthorizedException")
+                        showSnackbar(exception.message?.substringAfter("401: ") ?: "UnauthorizedException")
                     } catch (exception: ForbiddenException) { //403--current password field is incorrect
-                        showSnackbar(exception.message ?: "ForbiddenException")
+                        showSnackbar(exception.message?.substringAfter("403: ") ?: "ForbiddenException")
                     } catch (exception: NotFoundException) { //404--user not found
-                        showSnackbar(exception.message ?: "Not Found Exception")
+                        showSnackbar(exception.message?.substringAfter("404: ") ?: "Not Found Exception")
                     } catch (exception: TooManyRequestsException) { //429--exceeded rate limitations
-                        showSnackbar(exception.message ?: "Too Many Requests Exception")
+                        showSnackbar(exception.message?.substringAfter("429: ") ?: "Too Many Requests Exception")
                     }
                 }
                 changingPassword = false

@@ -1,11 +1,10 @@
 package edu.moravian.csci215.misophoniaapp.screens.login
 
 import BadRequestException
-import ErrorResponse
-import ForbiddenException
 import TooManyRequestsException
 import UnauthorizedException
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,8 +36,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.moravian.csci215.misophoniaapp.server_data.LoginResponse
-import io.ktor.client.call.body
-import io.ktor.client.plugins.ClientRequestException
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
@@ -62,6 +59,7 @@ fun PasswordLoginScreen(
     storeTokens: suspend (String, String) -> Unit,
     showSnackbar: (String) -> Unit,
     toHub: () -> Unit,
+    toForgotPassword: (String) -> Unit,
     onLogin: suspend (String, String, String) -> LoginResponse,
     ) {
     val (password, setPassword) = remember { mutableStateOf("")}
@@ -97,6 +95,13 @@ fun PasswordLoginScreen(
                    isPassword = true
                )
 
+               Text(
+                   text = "Forgot password?",
+                   modifier = Modifier.clickable(
+                       onClick =  { toForgotPassword(username) }
+                   )
+               )
+
                Row(
                    modifier = Modifier.fillMaxWidth(),
                    horizontalArrangement = Arrangement.SpaceBetween,
@@ -125,11 +130,11 @@ fun PasswordLoginScreen(
                            storeTokens(tokenResponse.access_token, tokenResponse.refresh_token)
                            toHub()
                        } catch (exception: UnauthorizedException) { //401
-                           showSnackbar(exception.message ?: "UnauthorizedException")
+                           showSnackbar(exception.message?.substringAfter("401: ") ?: "UnauthorizedException")
                        } catch (exception: BadRequestException) { //400
-                           showSnackbar(exception.message ?: "BadRequestException")
+                           showSnackbar(exception.message?.substringAfter("400: ") ?: "BadRequestException")
                        } catch (exception: TooManyRequestsException) { //429--exceeded rate limitations
-                           showSnackbar(exception.message ?: "Too Many Requests Exception")
+                           showSnackbar(exception.message?.substringAfter("429: ") ?: "Too Many Requests Exception")
                        }
                    } },
                modifier = Modifier

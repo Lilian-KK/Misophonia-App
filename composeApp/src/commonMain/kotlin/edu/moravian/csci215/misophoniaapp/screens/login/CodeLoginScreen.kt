@@ -152,11 +152,11 @@ fun CodeLoginScreen(
                             sendCode(username)
                             codeSent = true
                         } catch (exception: BadRequestException) { //400
-                            showSnackbar(exception.message ?: "BadRequestException")
+                            showSnackbar(exception.message?.substringAfter("400: ") ?: "BadRequestException")
                         } catch (exception: ForbiddenException) { //403--code could not be delivered
-                            showSnackbar(exception.message ?: "ForbiddenException")
+                            showSnackbar(exception.message?.substringAfter("403: ") ?: "ForbiddenException")
                         } catch (exception: TooManyRequestsException) { //429--exceeded rate limit
-                            showSnackbar(exception.message ?: "Too Many Requests Exception") }
+                            showSnackbar(exception.message?.substringAfter("429: ") ?: "Too Many Requests Exception") }
                         } },
                     modifier =
                         Modifier
@@ -258,11 +258,11 @@ fun CodeLoginScreen(
                                 try {
                                     sendCode(username)
                                 } catch (exception: BadRequestException) {
-                                    showSnackbar(exception.message ?: "BadRequest Exception")
+                                    showSnackbar(exception.message?.substringAfter("400: ") ?: "BadRequest Exception")
                                 } catch (exception: ForbiddenException) {
-                                    showSnackbar(exception.message ?: "Forbidden Exception")
+                                    showSnackbar(exception.message?.substringAfter("403: ") ?: "Forbidden Exception")
                                 } catch (exception: TooManyRequestsException) { //429--exceeded rate limitations
-                                    showSnackbar(exception.message ?: "Too Many Requests Exception")
+                                    showSnackbar(exception.message?.substringAfter("429: ") ?: "Too Many Requests Exception")
                                 }
                             }
                         }
@@ -285,13 +285,13 @@ fun CodeLoginScreen(
                                 storeTokens(tokenResponse.access_token, tokenResponse.refresh_token)
                                 toHub()
                             } catch (exception: UnauthorizedException) { //401--invalid username
-                                showSnackbar(exception.message ?: "Unauthorized Exception")
+                                showSnackbar(exception.message?.substringAfter("401: ") ?: "Unauthorized Exception")
                             } catch (exception: BadRequestException) { //400
-                                showSnackbar(exception.message ?: "Bad Request Exception")
+                                showSnackbar(exception.message?.substringAfter("400: ") ?: "Bad Request Exception")
                             } catch (exception: ForbiddenException) { //403--invalid text code
-                                showSnackbar(exception.message ?: "Forbidden Exception")
+                                showSnackbar(exception.message?.substringAfter("403: ") ?: "Forbidden Exception")
                             } catch (exception: TooManyRequestsException) { //429--exceeded rate limitations
-                                showSnackbar(exception?.message ?: "Too Many Requests Exception")
+                                showSnackbar(exception?.message?.substringAfter("429: ") ?: "Too Many Requests Exception")
                             }
                         } },
                     modifier =

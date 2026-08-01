@@ -20,7 +20,6 @@ suspend fun createAccount(
     println(username)
     val response = client.post("user") {
         contentType(ContentType.Application.Json)
-
         setBody(
             UserCreate(
                 code = code,
@@ -107,7 +106,7 @@ suspend fun refresh(
                 refresh_token = refreshToken
             )
         )
-    }.body() //this one will need to catch 400, 401 (invalid refresh token), and 429 (toomanyrequests)
+    }.body() //catches 400, 401, 429
 
 suspend fun changePassword(
     client: HttpClient,
