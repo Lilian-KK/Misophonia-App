@@ -5,6 +5,7 @@ import ForbiddenException
 import TooManyRequestsException
 import UnauthorizedException
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +26,12 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import edu.moravian.csci215.misophoniaapp.CodeChip
+import edu.moravian.csci215.misophoniaapp.CodeEntryPrompt
+import edu.moravian.csci215.misophoniaapp.FilledTextField
+import edu.moravian.csci215.misophoniaapp.OtpCodeInput
+import edu.moravian.csci215.misophoniaapp.ResendCodeRow
+import edu.moravian.csci215.misophoniaapp.fredokaFontFamily
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
@@ -33,10 +40,6 @@ import misophoniaapp.composeapp.generated.resources.go_back
 import misophoniaapp.composeapp.generated.resources.password
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-
-//hi lili if you're seeing this!! forgotpassword no longer uses a code to login, instead that's just a different method of logging in now.
-//this screen lets you reset your password while you're logging in if you forgot it--design it however you want!
-//i don't really know how this works functionality-wise, might have to ask server side for that
 
 @Serializable
 data class ForgotPassword(
@@ -48,69 +51,102 @@ fun ForgotPasswordScreen(
     username: String,
     goBack: () -> Unit,
     resetPassword: suspend (String, String, String) -> Unit,
+    sendCode: suspend (String) -> Unit,
     showSnackbar: (String) -> Unit
 ) {
-    var code by remember { mutableStateOf(listOf("", "", "", "", "", "")) }
-    val focusRequesters = remember { List(6) { FocusRequester() } }
+    var code by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("")}
     val coroutineScope = rememberCoroutineScope()
+    val fredoka = fredokaFontFamily()
 
-    Text("this is the forgotpasswordscreen!")
+    Column() {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            CodeEntryPrompt(fontFamily = fredoka)
 
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-    ) {
-        repeat(6) { index ->
-            if (index > 0) Spacer(modifier = Modifier.width(8.dp))
-            CodeChip(
-                value = code[index],
-                focusRequester = focusRequesters[index],
-                onValueChange = { newValue ->
-                    if (newValue.length <= 1 && (newValue.isEmpty() || newValue.all { it.isDigit() })) {
-                        code = code.toMutableList().apply { this[index] = newValue }
-                        if (newValue.isNotEmpty() && index < 5) {
-                            focusRequesters[index + 1].requestFocus()
+            OtpCodeInput(
+                fontFamily = fredoka,
+                onCodeChange = { code = it },
+            )
+
+            ResendCodeRow(
+                fontFamily = fredoka,
+                onResendClick = {
+                    coroutineScope.launch {
+                        try {
+                            sendCode(username)
+                            showSnackbar("A new code was sent to your phone number")
+                        } catch (exception: BadRequestException) {
+                            showSnackbar(exception.message ?: "BadRequest Exception")
+                        } catch (exception: ForbiddenException) {
+                            showSnackbar(exception.message ?: "Forbidden Exception")
+                        } catch (exception: TooManyRequestsException) { //429--exceeded rate limitations
+                            showSnackbar(exception.message ?: "Too Many Requests Exception")
                         }
                     }
                 },
             )
+
+//        repeat(6) { index ->
+//            if (index > 0) Spacer(modifier = Modifier.width(8.dp))
+//            CodeChip(
+//                value = code[index],
+//                focusRequester = focusRequesters[index],
+//                onValueChange = { newValue ->
+//                    if (newValue.length <= 1 && (newValue.isEmpty() || newValue.all { it.isDigit() })) {
+//                        code = code.toMutableList().apply { this[index] = newValue }
+//                        if (newValue.isNotEmpty() && index < 5) {
+//                            focusRequesters[index + 1].requestFocus()
+//                        }
+//                    }
+//                },
+//            )
+//        }
         }
-    }
 
-    IconButton(onClick = goBack, modifier = Modifier.size(48.dp)) {
-        Icon(
-            painter = painterResource(Res.drawable.back_arrow),
-            contentDescription = stringResource(Res.string.go_back),
-            modifier = Modifier.size(24.dp),
-            tint = Color.DarkGray
+        IconButton(onClick = goBack, modifier = Modifier.size(48.dp)) {
+            Icon(
+                painter = painterResource(Res.drawable.back_arrow),
+                contentDescription = stringResource(Res.string.go_back),
+                modifier = Modifier.size(24.dp),
+                tint = Color.DarkGray
+            )
+        }
+
+        FilledTextField(
+            value = newPassword,
+            onValueChange = { newPassword = it },
+            label = stringResource(Res.string.password),
+            keyboardType = KeyboardType.Password,
+            isPassword = true
         )
-    }
 
-    FilledTextField(
-        value = newPassword,
-        onValueChange = { newPassword = it },
-        label = stringResource(Res.string.password),
-        keyboardType = KeyboardType.Password,
-        isPassword = true
-    )
-
-    Button(
-        onClick = {
-            coroutineScope.launch {
-                try {
-                    resetPassword(username, code.joinToString(""), newPassword)
-                    goBack()
-                } catch (exception: ForbiddenException) { //403
-                    showSnackbar(exception.message?.substringAfter("40: ") ?: "UnauthorizedException")
-                } catch (exception: BadRequestException) { //400
-                    showSnackbar(exception.message?.substringAfter("400: ") ?: "BadRequestException")
-                } catch (exception: TooManyRequestsException) { //429--exceeded rate limitations
-                    showSnackbar(exception.message?.substringAfter("429: ") ?: "Too Many Requests Exception")
+        Button(
+            onClick = {
+                coroutineScope.launch {
+                    try {
+                        resetPassword(username, code, newPassword)
+                        goBack()
+                    } catch (exception: ForbiddenException) { //403
+                        showSnackbar(
+                            exception.message?.substringAfter("40: ") ?: "UnauthorizedException"
+                        )
+                    } catch (exception: BadRequestException) { //400
+                        showSnackbar(
+                            exception.message?.substringAfter("400: ") ?: "BadRequestException"
+                        )
+                    } catch (exception: TooManyRequestsException) { //429--exceeded rate limitations
+                        showSnackbar(
+                            exception.message?.substringAfter("429: ")
+                                ?: "Too Many Requests Exception"
+                        )
+                    }
                 }
             }
+        ) {
+            Text("Update password")
         }
-    ) {
-        Text("Update password")
     }
 }

@@ -2,7 +2,6 @@ package edu.moravian.csci215.misophoniaapp.screens.registration
 
 import BadRequestException
 import ConflictException
-import ErrorResponse
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,9 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import edu.moravian.csci215.misophoniaapp.CodeChip
+import edu.moravian.csci215.misophoniaapp.fredokaFontFamily
 import edu.moravian.csci215.misophoniaapp.server_data.UserResponse
-import io.ktor.client.call.body
-import io.ktor.client.plugins.ClientRequestException
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import misophoniaapp.composeapp.generated.resources.Res
@@ -47,10 +46,11 @@ data class VerifyPhoneNumber(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun VerifyPhoneNumberScreen(
+    username: String,
     showSnackbar: (String) -> Unit,
     goBack: () -> Unit,
     toHub: () -> Unit,
-    sendCode: suspend (String) -> Unit, //todo: add a resend code button like codelogin has
+    sendCode: suspend (String) -> Unit, //todo: add a resend code button like codelogin has--maybe a different endpoint than this one?
     createAccount: suspend (String) -> UserResponse,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -67,18 +67,19 @@ fun VerifyPhoneNumberScreen(
         ) {
             repeat(6) { index ->
                 if (index > 0) Spacer(modifier = Modifier.width(8.dp))
-//                CodeChip(
-//                    value = code[index],
-//                    focusRequester = focusRequesters[index],
-//                    onValueChange = { newValue ->
-//                        if (newValue.length <= 1 && (newValue.isEmpty() || newValue.all { it.isDigit() })) {
-//                            code = code.toMutableList().apply { this[index] = newValue }
-//                            if (newValue.isNotEmpty() && index < 5) {
-//                                focusRequesters[index + 1].requestFocus()
-//                            }
-//                        }
-//                    },
-//                )
+                CodeChip(
+                    value = code[index],
+                    focusRequester = focusRequesters[index],
+                    onValueChange = { newValue ->
+                        if (newValue.length <= 1 && (newValue.isEmpty() || newValue.all { it.isDigit() })) {
+                            code = code.toMutableList().apply { this[index] = newValue }
+                            if (newValue.isNotEmpty() && index < 5) {
+                                focusRequesters[index + 1].requestFocus()
+                            }
+                        }
+                    },
+                    fontFamily = fredokaFontFamily()
+                )
             }
         }
 
@@ -108,16 +109,4 @@ fun VerifyPhoneNumberScreen(
             Text("continue to hub")
         }
     }
-
-//    onClick = {
-//        coroutineScope.launch {
-//            try {
-//                //todo add code setup
-//                onCreateAccount(phoneNumber, username, "code", password)
-//                toHub()
-//            } catch (exception: ConflictException) {
-//                val error = exception.response?.body<ErrorResponse>()
-//                showSnackbar(error?.message ?: "")
-//            }
-//        }
 }

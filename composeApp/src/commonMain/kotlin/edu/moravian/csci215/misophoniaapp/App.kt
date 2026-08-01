@@ -248,6 +248,7 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
                                 snackbarHostState.showSnackbar(it)
                             }
                         },
+                        sendCode = {username: String -> sendLoginCode(httpClient, username)}
                     )
                 }
                 composable<CreateAccount> {
@@ -271,6 +272,7 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
                     val username = navBackStackEntry.toRoute<VerifyPhoneNumber>().username
                     val password = navBackStackEntry.toRoute<VerifyPhoneNumber>().password
                     VerifyPhoneNumberScreen(
+                        username = username,
                         showSnackbar = {
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(it)

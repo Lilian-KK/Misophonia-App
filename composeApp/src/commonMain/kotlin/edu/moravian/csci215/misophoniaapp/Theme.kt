@@ -269,7 +269,7 @@ fun CodeEntryPrompt(
  * part of [OtpCodeInput], never on its own.
  */
 @Composable
-private fun CodeChip(
+fun CodeChip(
     value: String,
     focusRequester: FocusRequester,
     onValueChange: (String) -> Unit,
