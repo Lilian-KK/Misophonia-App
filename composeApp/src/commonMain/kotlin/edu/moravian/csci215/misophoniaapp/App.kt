@@ -236,7 +236,7 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
                         toHub = { navController.navigate(Hub) },
                         onLogin = { username: String, login_method: String, login_value: String ->
                             logIn(httpClient, username, login_method, login_value)
-                        },
+                        }
                     )
                 }
                 composable<CreateAccount> {

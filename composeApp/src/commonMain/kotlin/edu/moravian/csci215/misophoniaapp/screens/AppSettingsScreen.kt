@@ -20,7 +20,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import edu.moravian.csci215.misophoniaapp.screens.login.FilledTextField
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
 import kotlinx.coroutines.launch
@@ -71,21 +70,21 @@ fun AppSettingsScreen(
         }
 
         //change password input fields
-        if (changingPassword) {
-            FilledTextField(
-                value = currentPassword,
-                onValueChange = { currentPassword = it },
-                label = "Current Password",
-                isPassword = true
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            FilledTextField(
-                value = newPassword,
-                onValueChange = { newPassword = it },
-                label = "New Password",
-                isPassword = true
-            )
-        }
+//        if (changingPassword) {
+//            FilledTextField(
+//                value = currentPassword,
+//                onValueChange = { currentPassword = it },
+//                label = "Current Password",
+//                isPassword = true
+//            )
+//            Spacer(modifier = Modifier.height(24.dp))
+//            FilledTextField(
+//                value = newPassword,
+//                onValueChange = { newPassword = it },
+//                label = "New Password",
+//                isPassword = true
+//            )
+//        }
 
         //changing password button
         Button(onClick = {

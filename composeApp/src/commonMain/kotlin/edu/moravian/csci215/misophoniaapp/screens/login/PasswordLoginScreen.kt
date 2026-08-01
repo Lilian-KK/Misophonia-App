@@ -68,7 +68,6 @@ fun PasswordLoginScreen(
     storeTokens: suspend (String, String) -> Unit,
     showSnackbar: (String) -> Unit,
     toHub: () -> Unit,
-    toForgotPassword: (String) -> Unit,
     onLogin: suspend (String, String, String) -> LoginResponse,
 ) {
     val (password, setPassword) = remember { mutableStateOf("") }
@@ -126,7 +125,7 @@ fun PasswordLoginScreen(
                     modifier =
                         Modifier
                             .align(Alignment.End)
-                            .clickable(onClick = { toForgotPassword(username) }),
+                            .clickable(onClick = { }),
                 )
             }
         }

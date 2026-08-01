@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import edu.moravian.csci215.misophoniaapp.screens.login.CodeChip
 import edu.moravian.csci215.misophoniaapp.server_data.UserResponse
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
@@ -68,18 +67,18 @@ fun VerifyPhoneNumberScreen(
         ) {
             repeat(6) { index ->
                 if (index > 0) Spacer(modifier = Modifier.width(8.dp))
-                CodeChip(
-                    value = code[index],
-                    focusRequester = focusRequesters[index],
-                    onValueChange = { newValue ->
-                        if (newValue.length <= 1 && (newValue.isEmpty() || newValue.all { it.isDigit() })) {
-                            code = code.toMutableList().apply { this[index] = newValue }
-                            if (newValue.isNotEmpty() && index < 5) {
-                                focusRequesters[index + 1].requestFocus()
-                            }
-                        }
-                    },
-                )
+//                CodeChip(
+//                    value = code[index],
+//                    focusRequester = focusRequesters[index],
+//                    onValueChange = { newValue ->
+//                        if (newValue.length <= 1 && (newValue.isEmpty() || newValue.all { it.isDigit() })) {
+//                            code = code.toMutableList().apply { this[index] = newValue }
+//                            if (newValue.isNotEmpty() && index < 5) {
+//                                focusRequesters[index + 1].requestFocus()
+//                            }
+//                        }
+//                    },
+//                )
             }
         }
 
