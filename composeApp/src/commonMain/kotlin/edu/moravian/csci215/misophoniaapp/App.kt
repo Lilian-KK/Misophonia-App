@@ -1,13 +1,9 @@
 package edu.moravian.csci215.misophoniaapp
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,7 +30,6 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-import misophoniaapp.composeapp.generated.resources.Res
 import misophoniaapp.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -234,9 +229,25 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
                             }
                         },
                         toHub = { navController.navigate(Hub) },
+                        toForgotPassword = { username: String -> navController.navigate(ForgotPassword(username)) },
                         onLogin = { username: String, login_method: String, login_value: String ->
                             logIn(httpClient, username, login_method, login_value)
                         }
+                    )
+                }
+                composable<ForgotPassword> { navBackStackEntry ->
+                    val username = navBackStackEntry.toRoute<ForgotPassword>().username
+                    ForgotPasswordScreen(
+                        username = username,
+                        goBack = { navController.navigateUp() },
+                        resetPassword = { username: String, code: String, newPassword: String ->
+                            resetPassword(httpClient, username, code, newPassword)
+                        },
+                        showSnackbar = {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(it)
+                            }
+                        },
                     )
                 }
                 composable<CreateAccount> {
