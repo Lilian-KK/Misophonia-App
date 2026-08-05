@@ -44,7 +44,7 @@
     <string name="app_settings_button">The app settings button</string>
     <string name="wifi_settings_button">The Wi-Fi settings button</string>
 
-    <!--ForgotPasswordScreen-->
+    <!--ForgotPasswordScreen--> <!--NORA NOTE: this is not for the current ForgotPasswordScreen, please update-->
     <string name="forgot_password">Forgot Password?</string>
     <string name="verify_for_pw_creation">We need to verify it's you to create a new password.</string>
     <string name="phone_number">Phone Number</string>
@@ -64,6 +64,10 @@
     <string name="show_password">Show password</string>
     <string name="hide_password">Hide password</string>
     <string name="go_back">Go back to previous screen</string>
+
+    <!--CodeLoginScreen-->
+    <string name="new_code_sent">A new code was sent to your phone number.</string>
+
 
     <!--SurveyHistoryScreen-->
     <string name="history">History</string>

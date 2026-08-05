@@ -47,6 +47,7 @@ import misophoniaapp.composeapp.generated.resources.back_arrow
 import misophoniaapp.composeapp.generated.resources.continue_
 import misophoniaapp.composeapp.generated.resources.go_back
 import misophoniaapp.composeapp.generated.resources.login
+import misophoniaapp.composeapp.generated.resources.new_code_sent
 import misophoniaapp.composeapp.generated.resources.send_code
 import misophoniaapp.composeapp.generated.resources.username
 import org.jetbrains.compose.resources.painterResource
@@ -127,13 +128,14 @@ fun CodeLoginScreen(
                     onCodeChange = { code = it },
                 )
 
+                val newCodeSentMessage = stringResource(Res.string.new_code_sent)
                 ResendCodeRow(
                     fontFamily = fredoka,
                     onResendClick = {
                         coroutineScope.launch {
                             try {
                                 sendCode(username)
-                                showSnackbar("A new code was sent to your phone number")
+                                showSnackbar(newCodeSentMessage)
                             } catch (exception: BadRequestException) {
                                 showSnackbar(exception.message ?: "BadRequest Exception")
                             } catch (exception: ForbiddenException) {

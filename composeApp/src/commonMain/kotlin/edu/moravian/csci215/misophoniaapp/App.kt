@@ -248,7 +248,14 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
                                 snackbarHostState.showSnackbar(it)
                             }
                         },
-                        sendCode = {username: String -> sendLoginCode(httpClient, username)}
+                        sendCode = {username: String -> sendLoginCode(httpClient, username)},
+                        storeTokens = { accessToken: String, refreshToken: String ->
+                            tokenStorage.storeTokens(accessToken, refreshToken)
+                        },
+                        toHub = { navController.navigate(Hub) },
+                        onLogin = { username: String, login_method: String, login_value: String ->
+                            logIn(httpClient, username, login_method, login_value)
+                        }
                     )
                 }
                 composable<CreateAccount> {
@@ -321,8 +328,7 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
                             }
                         },
                         clearTokens = { tokenStorage.wipeTokens() },
-                        logOut = { logout(httpClient, tokenStorage.refreshToken.first().toString()) //keep an eye on this one make sure its storing properly
-                             },
+                        logOut = { logout(httpClient, tokenStorage.refreshToken.first().toString()) }, //keep an eye on this one make sure its storing properly
                         toSetup = { navController.navigate(Setup) },
                         changePassword = { currentPassword: String, newPassword: String ->
                             changePassword(httpClient, currentPassword, newPassword)

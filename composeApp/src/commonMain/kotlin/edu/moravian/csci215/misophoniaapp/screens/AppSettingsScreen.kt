@@ -1,7 +1,6 @@
 package edu.moravian.csci215.misophoniaapp.screens
 
 import BadRequestException
-import ErrorResponse
 import ForbiddenException
 import NotFoundException
 import TooManyRequestsException
@@ -10,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,14 +20,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.ktor.client.call.body
-import io.ktor.client.plugins.ClientRequestException
+import edu.moravian.csci215.misophoniaapp.FilledTextField
+import edu.moravian.csci215.misophoniaapp.OtpCodeInput
+import edu.moravian.csci215.misophoniaapp.fredokaFontFamily
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 @Serializable
 data object AppSettings
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AppSettingsScreen(
     showSnackbar: (String) -> Unit,
@@ -38,6 +40,7 @@ fun AppSettingsScreen(
     toSetup: () -> Unit,
     ) {
     val coroutineScope = rememberCoroutineScope()
+    val fredoka = fredokaFontFamily()
 
     var changingPassword by remember { mutableStateOf(false) }
     var currentPassword by remember { mutableStateOf("") }
@@ -69,24 +72,23 @@ fun AppSettingsScreen(
             Text("Log out")
         }
 
-        //change password input fields
-//        if (changingPassword) {
-//            FilledTextField(
-//                value = currentPassword,
-//                onValueChange = { currentPassword = it },
-//                label = "Current Password",
-//                isPassword = true
-//            )
-//            Spacer(modifier = Modifier.height(24.dp))
-//            FilledTextField(
-//                value = newPassword,
-//                onValueChange = { newPassword = it },
-//                label = "New Password",
-//                isPassword = true
-//            )
-//        }
+        //change password
+        if (changingPassword) {
+            FilledTextField(
+                value = currentPassword,
+                onValueChange = { currentPassword = it },
+                label = "Current Password",
+                isPassword = true
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            FilledTextField(
+                value = newPassword,
+                onValueChange = { newPassword = it },
+                label = "New Password",
+                isPassword = true
+            )
+        }
 
-        //changing password button
         Button(onClick = {
             if (!changingPassword) {
                 changingPassword = true
@@ -94,6 +96,7 @@ fun AppSettingsScreen(
                 coroutineScope.launch {
                     try {
                         changePassword(currentPassword, newPassword)
+                        showSnackbar("Password successfully changed.")
                     } catch (exception: BadRequestException) {
                         showSnackbar(exception.message ?: "BadRequestException")
                     } catch (exception: UnauthorizedException) {
@@ -113,41 +116,55 @@ fun AppSettingsScreen(
             Text("Change Password")
         }
 
-//        //change phone number input fields
-//        if (changingPhoneNumber) {
-//            FilledTextField(
-//                value = newPhoneNumber,
-//                onValueChange = {newPhoneNumber = it},
-//                label = "New Phone Number"
-//            )
-//            Spacer(modifier = Modifier.height(24.dp))
-//
-//            Button(onClick = { codeBoxVisible = true } ) {
-//                Text("Send Code")
-//            }
-//
-//            if (codeBoxVisible) {
-//                FilledTextField(
-//                    value = code,
-//                    onValueChange = { code = it },
-//                    label = "6-digit code"
-//                )
-//            }
-//        }
-//
-//        //changing phone number button
-//        Button(onClick = {
-//            if (!changingPhoneNumber) {
-//                changingPhoneNumber = true
-//            }
-//            else {
-//                changePhoneNumber(newPhoneNumber, code)
-//                changingPhoneNumber = false
-//            }
-//        }
-//        ) {
-//            Text("Change Password")
-//        }
-//    }
+
+        //changing phone number
+        if (!changingPhoneNumber) {
+            Button(onClick = { changingPhoneNumber = true } ) {
+                Text("Change Phone Number")
+            }
+        } else {
+            if (changingPhoneNumber) {
+                FilledTextField(
+                    value = newPhoneNumber,
+                    onValueChange = {newPhoneNumber = it},
+                    label = "New Phone Number"
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(onClick = {
+                    //todo add a send code endpoint here
+                    codeBoxVisible = true
+                } ) {
+                    Text("Send Code")
+                }
+
+                if (codeBoxVisible) {
+                    OtpCodeInput(
+                        fontFamily = fredoka,
+                        onCodeChange = { code = it },
+                    )
+                }
+            }
+
+            Button(onClick = { coroutineScope.launch {
+                    try {
+                        changePhoneNumber(newPhoneNumber, code)
+                        changingPhoneNumber = false
+                        showSnackbar("Phone number successfully changed.")
+                    } catch (exception: BadRequestException) {
+                        showSnackbar(exception.message ?: "BadRequestException")
+                    } catch (exception: UnauthorizedException) {
+                        showSnackbar(exception.message ?: "UnauthorizedException")
+                    } catch (exception: ForbiddenException) { //403--invalid code
+                        showSnackbar(exception.message ?: "ForbiddenException")
+                    } catch (exception: NotFoundException) { //404--user not found
+                        showSnackbar(exception.message ?: "Not Found Exception")
+                    }
+                } }
+            ) {
+                Text("Change Phone Number")
+            }
+        }
+
     }
 }
