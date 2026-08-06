@@ -121,6 +121,14 @@ fun ForgotPasswordScreen(
             }
 
             if (codeSent) {
+                FilledTextField(
+                    value = newPassword,
+                    onValueChange = { newPassword = it },
+                    label = "New Password",
+                    keyboardType = KeyboardType.Password,
+                    isPassword = true
+                )
+
                 CodeEntryPrompt(fontFamily = fredoka)
 
                 OtpCodeInput(
@@ -172,15 +180,6 @@ fun ForgotPasswordScreen(
                     },
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
-
-                FilledTextField(
-                    value = newPassword,
-                    onValueChange = { newPassword = it },
-                    label = "New Password",
-                    keyboardType = KeyboardType.Password,
-                    isPassword = true
-                )
             }
         }
 

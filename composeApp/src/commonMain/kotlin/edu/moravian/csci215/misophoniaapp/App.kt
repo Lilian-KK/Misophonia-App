@@ -280,6 +280,7 @@ fun App(repository: SurveyRepository, tokenStorage: TokenStorage) {
                     val password = navBackStackEntry.toRoute<VerifyPhoneNumber>().password
                     VerifyPhoneNumberScreen(
                         username = username,
+                        phoneNumber = phoneNumber,
                         showSnackbar = {
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(it)

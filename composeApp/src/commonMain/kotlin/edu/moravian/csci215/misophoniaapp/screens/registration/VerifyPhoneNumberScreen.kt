@@ -57,7 +57,7 @@ fun VerifyPhoneNumberScreen(
     showSnackbar: (String) -> Unit,
     goBack: () -> Unit,
     toHub: () -> Unit,
-    sendCode: suspend (String) -> Unit, //todo: add a resend code button like codelogin has--maybe a different endpoint than this one?
+    sendCode: suspend (String) -> Unit,
     createAccount: suspend (String) -> UserResponse,
 ) {
     val coroutineScope = rememberCoroutineScope()
